@@ -1,0 +1,126 @@
+---
+description: Conductor context-driven development file resolution and artifact paths
+alwaysApply: true
+---
+
+# Conductor Context
+
+If a user mentions a "plan" or asks about the plan, and they have used Conductor in the current session, they are likely referring to `.cursor/context/tracks.md` or a track plan in `.cursor/plans/*.plan.md`.
+
+## Universal File Resolution Protocol
+
+**PROTOCOL: How to locate files.**
+To find a file (e.g., "**Product Definition**") within a specific context (Project Root or a specific Track):
+
+1.  **Identify Index:** Determine the relevant index file:
+    -   **Project Context:** `.cursor/context/index.md`
+    -   **Track Context:**
+        a. Resolve and read the **Tracks Registry** (via Project Context).
+        b. Find the entry for the specific `<track_id>`.
+        c. Follow the link provided in the registry to locate the track's spec folder. The index file is `.cursor/specs/<track_id>/index.md`.
+        d. **Fallback:** If the track is not yet registered (e.g., during creation) or the link is broken:
+            1. Resolve the **Specs Directory** (`.cursor/specs/`).
+            2. The index file is `.cursor/specs/<track_id>/index.md`.
+
+2.  **Check Index:** Read the index file and look for a link with a matching or semantically similar label.
+
+3.  **Resolve Path:** If a link is found, resolve its path **relative to the directory containing the `index.md` file**.
+    -   *Example:* If `.cursor/context/index.md` links to `./workflow.md`, the full path is `.cursor/context/workflow.md`.
+
+4.  **Fallback:** If the index file is missing or the link is absent, use the **Default Path** keys below.
+
+5.  **Verify:** You MUST verify the resolved file actually exists on the disk.
+
+**Standard Default Paths (Project):**
+- **Product Definition**: `.cursor/context/product.md`
+- **Tech Stack**: `.cursor/context/tech-stack.md`
+- **Workflow**: `.cursor/context/workflow.md`
+- **Product Guidelines**: `.cursor/context/product-guidelines.md`
+- **Tracks Registry**: `.cursor/context/tracks.md`
+- **Specs Directory**: `.cursor/specs/`
+- **Plans Directory**: `.cursor/plans/`
+- **Archive Directory**: `.cursor/archive/`
+
+**Standard Default Paths (Track):**
+- **Specification**: `.cursor/specs/<track_id>/spec.md`
+- **Implementation Plan**: `.cursor/plans/<plan_filename>.plan.md` (linked from Tracks Registry)
+- **Metadata**: `.cursor/specs/<track_id>/metadata.json`
+
+## Cursor Plan Format
+
+Implementation plans use Cursor-native frontmatter in `.cursor/plans/*.plan.md`:
+
+```yaml
+---
+name: Track Title
+overview: One-paragraph summary
+todos:
+  - id: conductor-sync-in-progress
+    content: "Conductor — Mark track in progress (tracks.md [~], metadata.json in_progress)"
+    status: pending
+  - id: task-id
+    content: "Task description"
+    status: pending
+  - id: conductor-sync-complete
+    content: "Conductor — Mark track complete (tracks.md [x], metadata.json completed)"
+    status: pending
+isProject: true
+---
+```
+
+Frontmatter `todos` are the source of truth for implement, status, and revert. Append commit SHAs to `content` on completion.
+
+**Mandatory sync bookends** — every generated plan MUST include:
+
+- **First todo:** `id: conductor-sync-in-progress` — mark track `[~]` in **Tracks Registry**, set `metadata.json` `status: in_progress`, update `updated_at`.
+- **Last todo:** `id: conductor-sync-complete` — mark track `[x]`, set `metadata.json` `status: completed`, update `updated_at`, commit Conductor files.
+
+Do NOT inject feature-branch or worktree todos by default. See **Git Isolation Protocol** below.
+
+For detailed plan authoring rules, resolve `templates/plan-authoring-guide.md` from the installed Conductor plugin (same lookup order as skills).
+
+## Git Write Policy
+
+**NEVER** perform Git write operations without user approval.
+
+**Git write operations** include any command that mutates repository state, for example:
+- `git add` (staging)
+- `git commit`
+- `git push`, `git pull` (when it merges or rebases)
+- `git checkout` / `git switch` (including branch creation)
+- `git merge`, `git rebase`, `git cherry-pick`, `git revert`
+- `git stash` (push, pop, apply)
+- `git notes add`
+- `git reset` (any mode that changes HEAD or the index)
+
+**Read-only operations** (`git status`, `git log`, `git diff`, `git show`, `git branch --list`, `git branch --show-current`) do not require approval.
+
+**Before any Git write operation:**
+
+1. **Explicit request:** If the user's message explicitly authorizes the operation (e.g., "commit these changes", "push to origin", "create a feature branch"), proceed.
+2. **Otherwise ask:** You MUST call `AskQuestion` before executing. Do not repeat the question in chat. State the exact command(s) you intend to run.
+   - **header:** "Git"
+   - **question:** "I need to run: `<command(s)>`. Proceed?"
+   - **type:** "yesno"
+3. **If declined:** Do not run the command. Explain what was skipped and continue the workflow when possible.
+4. **Batching:** When multiple write operations belong together (e.g., `git add` then `git commit`), ask once and list all commands.
+5. **Prior approval:** If an earlier `AskQuestion` in the same Conductor command already authorized the specific Git command(s) (e.g., revert plan "Approve", review "Should I commit these?"), do not ask again for those commands.
+
+This policy applies to all Conductor commands, skills, and the project **Workflow** template.
+
+## Git Isolation Protocol
+
+When starting track implementation (`/conductor-implement`) or executing a plan directly in Cursor, ask the user how to isolate git work **after** `conductor-sync-in-progress` and **before** any other Git write operations or implementation code:
+
+1. If no `.git` directory exists, skip and announce that Git workflows are unavailable.
+2. If the user's message **explicitly** requested a workflow (e.g., "implement on a feature branch"), follow that request without asking.
+3. Otherwise, call `AskQuestion` once (do not repeat in chat):
+   - **header:** "Git Workflow"
+   - **type:** `choice`, `multiSelect: false`
+   - **options:**
+     - **Current branch** — Continue on the current branch (default for small/chore tracks)
+     - **Feature branch** — Create or switch to a branch (suggest `feature/<track_id>`; confirm name via follow-up `AskQuestion` if needed)
+     - **Git worktree** — Create an isolated worktree (user confirms path/name)
+     - **Other** — User describes a custom team workflow
+4. Follow **Git Write Policy** for all git commands (`git checkout -b`, `git switch -c`, `git worktree add`, etc.).
+5. Do not add git-isolation todos to plans unless the user explicitly asked during new-track planning.

@@ -1,0 +1,18 @@
+{
+  "name": "cursorcade",
+  "owner": {
+    "name": "newtonmunene99"
+  },
+  "metadata": {
+    "description": "A curated arcade of Cursor plugins for developers who mean business.",
+    "version": "1.0.0",
+    "logo": "assets/logo.svg"
+  },
+  "plugins": [
+    {
+      "name": "conductor",
+      "source": "./plugins/conductor",
+      "description": "Context-Driven Development: setup, spec, plan, implement, review."
+    }
+  ]
+}

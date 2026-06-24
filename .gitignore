@@ -1,0 +1,6 @@
+# Cursor plugin marketplace repo
+
+.DS_Store
+
+# Conductor temp
+tmp/
