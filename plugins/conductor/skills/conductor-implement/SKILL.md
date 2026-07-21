@@ -12,6 +12,12 @@ description: Execute tasks from a track's Cursor plan
 - **Shell** for shell commands (replaces `run_shell_command`)
 - Use relative paths under `.cursor/` for all Conductor artifacts
 
+## Output Style
+
+Follow **Agent Output Style** in the Conductor rule. Resolve `templates/output-style.md` for full rules.
+
+**Implement-specific:** Each progress message = (1) what now works, (2) task N/M + track name, (3) next todo. On errors: file:line, cause, fix. On track complete: lead with shipped outcome, then cleanup via `AskQuestion` only.
+
 ## Plugin Template Path
 
 Locate installed plugin templates in this order:
@@ -129,7 +135,7 @@ CRITICAL: You must validate the success of every tool call. If any tool call fai
 ## 3.0 TRACK IMPLEMENTATION
 **PROTOCOL: Execute the selected track.**
 
-1.  **Announce Action:** Announce which track you are beginning to implement.
+1.  **Announce Action:** One line: track name + first todo you are starting (no "I will now..." preamble).
 
 2.  **Load Track Context:**
     a. **Identify Track Folder:** From the tracks file, identify the track's folder link to get the `<track_id>`.
@@ -145,7 +151,7 @@ CRITICAL: You must validate the success of every tool call. If any tool call fai
     -   After this step, run **Git Isolation** per §3.0 step 4d before the task loop continues.
 
 4.  **Execute Tasks and Update Track Plan:**
-    a. **Announce:** State that you will execute tasks from the track's **Cursor plan file** following the **Workflow**.
+    a. **Announce:** One line: executing plan todos per **Workflow** (task index when known).
     b. **Iterate Through Tasks:** Loop each todo in frontmatter order. Track whether **Git Isolation** has run this session (`git_isolation_done`).
     c. **For Each Task:**
         i. **`conductor-sync-in-progress`:** Update registry `[~]`, metadata `in_progress`, refresh `updated_at`. Mark todo `completed`. Follow **Git Write Policy** for any commit. Then run **Git Isolation** per step d if not yet done.
@@ -224,16 +230,11 @@ CRITICAL: You must validate the success of every tool call. If any tool call fai
                     - **type:** "yesno"
         iv. **Action:** Only after receiving explicit user confirmation, perform the file edits. Keep a record of whether this file was changed.
 
-6.  **Final Report:** Announce the completion of the synchronization process and provide a summary of the actions taken.
-    - **Construct the Message:** Based on the records of which files were changed, construct a summary message.
-    - **Commit Conductor Files:** If any files were changed (**Product Definition**, **Tech Stack**, or **Product Guidelines**), follow the **Git Write Policy** in the Conductor rule before staging and committing. Suggested message: `docs(conductor): Synchronize docs for track '<track_description>'`
-    - **Example (if Product Definition was changed, but others were not):**
-        > "Documentation synchronization is complete.
-        > - **Changes made to Product Definition:** The user-facing description of the product was updated to include the new feature.
-        > - **No changes needed for Tech Stack:** The technology stack was not affected.
-        > - **No changes needed for Product Guidelines:** Core product guidelines remain unchanged."
-    - **Example (if no files were changed):**
-        > "Documentation synchronization is complete. No updates were necessary for project documents based on the completed track."
+6.  **Final Report:** One line per changed file (max 5). If none changed: "No doc updates needed." If any file changed, follow **Git Write Policy** before commit (`docs(conductor): Synchronize docs for track '<track_description>'`).
+    - **Example (Product Definition changed):**
+        > "Docs synced. **Product Definition** updated for the new feature. **Tech Stack** and **Product Guidelines** unchanged."
+    - **Example (no changes):**
+        > "Docs synced. No project doc updates needed for this track."
 
 ---
 

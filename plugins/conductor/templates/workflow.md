@@ -1,5 +1,9 @@
 # Project Workflow
 
+## Agent Messages During Implementation
+
+Follow **Agent Output Style** in the Conductor rule (`templates/output-style.md`). Each update: what works now, task N/M, next step. Manual verification plans use numbered steps with commands and expected outcomes.
+
 ## Guiding Principles
 
 1. **The Plan is the Source of Truth:** All work must be tracked in the Cursor plan file (`.cursor/plans/*.plan.md` frontmatter `todos`)
@@ -99,7 +103,7 @@ Use this protocol when tests fail, behavior is unexpected, or a fix attempt did 
 
 **Trigger:** This protocol is executed immediately after a task is completed that also concludes a phase in the Cursor plan file.
 
-1.  **Announce Protocol Start:** Inform the user that the phase is complete and the verification and checkpointing protocol has begun.
+1.  **Announce Protocol Start:** One line: "Phase '<name>' complete — running verification (task N/M)."
 
 2.  **Ensure Test Coverage for Phase Changes:**
     -   **Step 2.1: Determine Phase Scope:** To identify the files changed in this phase, you must first find the starting point. Read the Cursor plan file to find the Git commit SHA of the *previous* phase's checkpoint. If no previous checkpoint exists, the scope is all changes since the first commit.

@@ -12,6 +12,12 @@ description: Review completed work against guidelines, plan, spec, and documenta
 - **Shell** for shell commands (replaces `run_shell_command`)
 - Use relative paths under `.cursor/` for all Conductor artifacts
 
+## Output Style
+
+Follow **Agent Output Style** in the Conductor rule. Resolve `templates/output-style.md` for full rules.
+
+**Review-specific:** Line 1 = **Verdict:** `Approve` | `Approve with nits` | `Request changes` — one-sentence reason. Then structured report. Show max 5 Critical/High findings in chat; summarize the rest by count.
+
 ## Plugin Template Path
 
 Locate installed plugin templates in this order:
@@ -202,7 +208,10 @@ Document errors, panics, and edge cases when the signature alone is insufficient
 **Proto tracks:** When `.proto` files changed, verify service/RPC/message/field/enum comments describe domain meaning, idempotency, error cases, and proto3 zero-value behavior where non-obvious.
 
 ### 2.4 Output Findings
-**Format your output strictly as follows:**
+
+**Line 1 (before the report heading):** `**Verdict:** <Approve | Approve with nits | Request changes> — <one-sentence reason>`
+
+**Format the report strictly as follows:**
 
 # Review Report: [Track Name / Context]
 
@@ -269,10 +278,10 @@ Document errors, panics, and edge cases when the signature alone is insufficient
     - **Approve with nits** — **Medium** and/or **Low** only (no Critical, no High)
     - **Approve** — no actionable findings (positive notes only, or clean review)
 
-2.  **Announce verdict:**
-    - **Request changes:** "Verdict: Request changes. Resolve Critical and High findings before archive (High may be explicitly waived)."
-    - **Approve with nits:** "Verdict: Approve with nits. Medium/Low suggestions remain; no blocking issues."
-    - **Approve:** "Verdict: Approve. No blocking issues found."
+2.  **Announce verdict:** One line only — verdict + blocking issue count if any. Do not repeat the full report.
+    - **Request changes:** "Verdict: Request changes — N Critical, M High. Fix or waive High before archive."
+    - **Approve with nits:** "Verdict: Approve with nits — N Medium/Low suggestions only."
+    - **Approve:** "Verdict: Approve — no blocking issues."
 
 3.  **Action by verdict:**
 

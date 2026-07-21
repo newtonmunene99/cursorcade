@@ -12,6 +12,12 @@ description: Scaffold project and set up the Conductor environment
 - **Shell** for shell commands (replaces `run_shell_command`)
 - Use relative paths under `.cursor/` for all Conductor artifacts
 
+## Output Style
+
+Follow **Agent Output Style** in the Conductor rule. Resolve `templates/output-style.md` for full rules.
+
+**Setup-specific:** Line 1 = current step and what to do now (answer the pending `AskQuestion`, or the command to run). State "Step N of 7" when resuming. No welcome preambles.
+
 ## Plugin Template Path
 
 Locate installed plugin templates in this order:
@@ -62,15 +68,9 @@ CRITICAL: You must validate the success of every tool call. If a tool call fails
 ---
 
 ## 1.1 PRE-INITIALIZATION OVERVIEW
-1.  **Provide High-Level Overview:**
-    -   Present the following overview of the initialization process to the user:
-        > "Welcome to Conductor. I will guide you through the following steps to set up your project:
-        > 1. **Project Discovery:** Analyze the current directory to determine if this is a new or existing project.
-        > 2. **Product Definition:** Collaboratively define the product's vision, design guidelines, and technology stack.
-        > 3. **Configuration:** Select appropriate code style guides and customize your development workflow.
-        > 4. **Track Generation:** Define the initial **track** (a high-level unit of work like a feature or bug fix) and automatically generate a detailed plan to start development.
-        >
-        > Let's get started!"
+1.  **State first step (no welcome preamble):**
+    -   Line 1: "Step 1/7: Project discovery — I'll check whether this is greenfield or brownfield."
+    -   Then run the audit (§1.2). Do not list all seven steps upfront unless the user asks.
 
 ---
 
@@ -260,7 +260,7 @@ CRITICAL: You must validate the success of every tool call. If a tool call fails
         -   **Interaction Flow:** Wait for the user's response, then proceed to the next step.
 
 4.  **Draft the Document:** Once the dialogue is complete (or "Autogenerate" was selected), generate the content for `product-guidelines.md`.
-    -   **If user chose "Autogenerate":** Use your best judgment to infer standard, high-quality guidelines suitable for the project type.
+    -   **If user chose "Autogenerate":** Use your best judgment to infer standard, high-quality guidelines suitable for the project type. Include an **Agent Communication** section: action-first responses, numbered steps, restated progress each turn, no preamble/closers (align with `templates/output-style.md`).
     -   **If user chose "Interactive":** Use the specific answers provided. The source of truth is **only the user's selected answer(s)**. You are encouraged to expand on these choices to create a polished output.
 5.  **User Confirmation Loop:**
     -   **Ask for Approval:** Use the `AskQuestion` tool to request confirmation. You MUST embed the drafted content directly into the `question` field so the user can review it in context.
@@ -583,5 +583,5 @@ CRITICAL: You must validate the success of every tool call. If a tool call fails
 ### 3.4 Final Announcement
 1.  **Announce Completion:** After the track has been created, announce that the project setup and initial track generation are complete.
 2.  **Save Conductor Files:** Follow the **Git Write Policy** in the Conductor rule before any staging or commit. Suggested message: `conductor(setup): Add conductor setup files`.
-3.  **Next Steps:** Inform the user that they can now begin work by running `/conductor-implement`.
+3.  **Next Steps:** One line: "Run `/conductor-implement` to start the initial track `<track_id>`."
 

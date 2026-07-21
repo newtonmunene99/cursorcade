@@ -12,6 +12,12 @@ description: Create a new track with brainstorm, spec, and Cursor plan
 - **Shell** for shell commands (replaces `run_shell_command`)
 - Use relative paths under `.cursor/` for all Conductor artifacts
 
+## Output Style
+
+Follow **Agent Output Style** in the Conductor rule. Resolve `templates/output-style.md` for full rules.
+
+**New-track-specific:** Line 1 = current phase (brainstorm | spec | plan) and the one thing the user should do. Restate approved design in ≤5 bullets before drafting spec. On completion: "Run `/conductor-implement` on `<track_id>`."
+
 ## Plugin Template Path
 
 Locate installed plugin templates in this order:
@@ -99,8 +105,7 @@ CRITICAL: You must validate the success of every tool call. If any tool call fai
 
 **HARD-GATE:** Do NOT draft `spec.md`, create a plan, or write implementation code until the user has approved the design for this track.
 
-1.  **State Your Goal:** Announce:
-    > "I'll explore the idea with you and shape a design before we write the specification."
+1.  **State Your Goal:** One line: "Brainstorm: I'll ask about purpose and constraints before writing the spec." (No multi-paragraph intro.)
 
 2.  **Explore Context:** Read **Product Definition**, **Tech Stack**, and relevant codebase areas related to the track description.
 
@@ -120,8 +125,7 @@ Skip multi-approach design. Use **one question per `AskQuestion` call** to cover
 
 ### 2.3 Interactive Specification Generation (`spec.md`)
 
-1.  **State Your Goal:** Announce:
-    > "I'll now draft the specification (`spec.md`) from our approved design."
+1.  **State Your Goal:** One line: "Drafting `spec.md` from the approved design."
 
 2.  **Questioning Phase (if gaps remain):** Ask follow-up questions using the `AskQuestion` tool. You may batch up to 4 related questions in a single tool call. Tailor questions based on the track type (Feature or Other).
     *   **CRITICAL:** Wait for the user's response after each `AskQuestion` tool call.
@@ -183,8 +187,7 @@ Skip multi-approach design. Use **one question per `AskQuestion` call** to cover
 
 ### 2.4 Interactive Plan Generation (Cursor plan file)
 
-1.  **State Your Goal:** Once `spec.md` is approved, announce:
-    > "Now I will create an implementation plan (Cursor plan file) based on the specification."
+1.  **State Your Goal:** One line: "Drafting the Cursor plan from the approved spec."
 
 2.  **Load Plan Authoring Guide:** Resolve and read `templates/plan-authoring-guide.md` from the **Plugin Template Path**. Follow it for plan quality, mandatory sync todos, and plan body structure.
 
@@ -259,7 +262,6 @@ Skip multi-approach design. Use **one question per `AskQuestion` call** to cover
 8.  **Commit Conductor Files:**
     -   Follow the **Git Write Policy** in the Conductor rule for all files created or modified in this workflow (spec, plan, index, metadata, **Tracks Registry**).
     -   Suggested message: `chore(conductor): Add new track '<track_description>'`.
-9.  **Announce Completion:** Inform the user:
-    > "New track '<track_id>' has been created and added to the tracks file. Start implementation with `/conductor-implement`, or run the plan directly from Cursor chat."
+9.  **Announce Completion:** One line: "Track `<track_id>` ready. Next: run `/conductor-implement`."
 
 

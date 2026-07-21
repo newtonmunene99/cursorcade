@@ -12,6 +12,12 @@ description: Git-aware revert of track, phase, or task
 - **Shell** for shell commands (replaces `run_shell_command`)
 - Use relative paths under `.cursor/` for all Conductor artifacts
 
+## Output Style
+
+Follow **Agent Output Style** in the Conductor rule. Resolve `templates/output-style.md` for full rules.
+
+**Revert-specific:** Line 1 = revert target + commit count. Numbered execution plan before any git write. Errors: SHA, cause, manual fix step. Completion: one line — what was reverted and plan state now.
+
 ## Plugin Template Path
 
 Locate installed plugin templates in this order:
@@ -122,13 +128,11 @@ CRITICAL: You must validate the success of every tool call. If any tool call fai
 ## 4.0 PHASE 3: FINAL EXECUTION PLAN CONFIRMATION
 **GOAL: Present a clear, final plan of action to the user before modifying anything.**
 
-1.  **Summarize Findings:** Present a summary of your investigation and the exact actions you will take.
-    > "I have analyzed your request. Here is the plan:"
-    > *   **Target:** Revert Task '[Task Description]'.
-    > *   **Commits to Revert:** 2
-    > `  - <sha_code_commit> ('feat: Add user profile')`
-    > `  - <sha_plan_commit> ('conductor(plan): Mark task complete')`
-    > *   **Action:** I will run `git revert` on these commits in reverse order.
+1.  **Summarize Findings:** Numbered plan (max 5 lines). Line 1 = target + commit count.
+    > **Target:** Task '[Task Description]' — 2 commits
+    > 1. Revert `<sha>` — feat: Add user profile
+    > 2. Revert `<sha>` — conductor(plan): Mark task complete
+    > **Action:** `git revert` in reverse order (requires approval below)
 
 2.  **Final Go/No-Go:** Immediately call the `AskQuestion` tool to ask for final confirmation (do not repeat the question in the chat):
     - **questions:**

@@ -5,7 +5,7 @@
   },
   "metadata": {
     "description": "A curated arcade of Cursor plugins for developers who mean business.",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "logo": "assets/logo.svg"
   },
   "plugins": [

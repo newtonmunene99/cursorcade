@@ -10,7 +10,7 @@ Every plan body MUST start with:
 
 ```markdown
 > **Conductor plan:** Runnable directly in Cursor or via `/conductor-implement`.
-> Follow `.cursor/context/workflow.md` and the Git Write Policy in the Conductor rule.
+> Follow `.cursor/context/workflow.md`, the Git Write Policy, and Agent Output Style in the Conductor rule.
 ```
 
 Below the header, include:
@@ -60,18 +60,20 @@ Each frontmatter todo is the smallest unit that:
 
 Fold setup, configuration, and scaffolding into the todo whose deliverable needs them. Split only where a reviewer could reject one task while approving its neighbor.
 
+**Action-first todo text:** Start each `content` string with a verb ("Write failing tests for login", not "Login tests"). One deliverable per todo — no "and then" chains.
+
 ## Plan body detail (per task)
 
 For each todo, the markdown body MUST include a section with:
 
 - **Files:** `Create`, `Modify`, and `Test` paths (exact paths)
 - **Interfaces:** what this task consumes from earlier tasks and what later tasks rely on (signatures, types, function names)
-- **Micro-steps** (when workflow uses TDD), as checkboxes:
-  - Write failing test
-  - Run test — verify it fails for the expected reason
-  - Implement minimal code
-  - Run test — verify pass
-  - Commit (Git Write Policy applies)
+- **Micro-steps** (when workflow uses TDD), as a **numbered list** (one bounded action per step):
+  1. Write failing test
+  2. Run test — verify it fails for the expected reason
+  3. Implement minimal code
+  4. Run test — verify pass
+  5. Commit (Git Write Policy applies)
 - **Commands** with expected output where applicable
 
 ## No placeholders

@@ -48,6 +48,7 @@ For local symlinks: `rm ~/.cursor/plugins/local/conductor`, then reload Cursor.
 Bundled under `templates/`:
 
 - `workflow.md` — Default TDD workflow (copied to `.cursor/context/workflow.md` on setup)
+- `output-style.md` — Action-first agent output rules (plugin reference, not copied on setup)
 - `plan-authoring-guide.md` — Plan quality rules and mandatory sync todos (plugin reference, not copied on setup)
 - `code_styleguides/` — Language style guides (copied to `.cursor/context/code_styleguides/`)
 
