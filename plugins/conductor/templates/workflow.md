@@ -2,7 +2,7 @@
 
 ## Agent Messages During Implementation
 
-Follow **Agent Output Style** in the Conductor rule (`templates/output-style.md`). Each update: what works now, task N/M, next step. Manual verification plans use numbered steps with commands and expected outcomes.
+Follow **Agent Output Style** in the Conductor rule (**i-have-adhd** skill + `templates/output-style.md` for command formats). Each update: what works now, task N/M, next step. Manual verification plans use numbered steps with commands and expected outcomes.
 
 ## Guiding Principles
 

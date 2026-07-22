@@ -14,7 +14,7 @@ description: Review completed work against guidelines, plan, spec, and documenta
 
 ## Output Style
 
-Follow **Agent Output Style** in the Conductor rule. Resolve `templates/output-style.md` for full rules.
+Follow **Agent Output Style** in the Conductor rule — **i-have-adhd** skill for base rules; `templates/output-style.md` for review format.
 
 **Review-specific:** Line 1 = **Verdict:** `Approve` | `Approve with nits` | `Request changes` — one-sentence reason. Then structured report. Show max 5 Critical/High findings in chat; summarize the rest by count.
 
@@ -98,6 +98,27 @@ CRITICAL: You must validate the success of every tool call. If any tool call fai
 | **Working tree** | Scope is `current` or uncommitted/staged changes only | **Full** — Critical, High, Medium, Low |
 
 Default to **Track complete** when a track plan is in context.
+
+### 2.1b Programme review mode
+
+Before §2.2, check for programme review:
+
+| Trigger | Action |
+| ------- | ------ |
+| `{{args}}` matches programme name/id | Programme review |
+| User asks to review remediation programme | Programme review |
+| ≥3 tracks share `programme_id` in metadata and all are `[ ]` or `[~]` | Offer programme review via `AskQuestion` |
+
+**Programme review protocol:**
+
+1. Load `templates/programme-review-checklist.md` from **Plugin Template Path**.
+2. Read programme header + sequencing table from **Tracks Registry**.
+3. Load all programme track specs, plans, and `metadata.json` files.
+4. Run checklist items 1–8; record pass/fail with evidence.
+5. **Verdict:** `Programme ready` | `Programme needs fix pass` (list blocking items by track id).
+6. Do not proceed to single-track diff review unless user selects a specific track within the programme.
+
+Use `/conductor-programme-review` as alias entry point (same protocol).
 
 ### 2.2 Retrieve Context and Diff
 

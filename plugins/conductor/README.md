@@ -4,58 +4,52 @@ Context-driven development for Cursor: setup, spec, plan, implement, review, and
 
 **Measure twice, code once.**
 
-## Install
-
-Add the [Cursorcade](https://github.com/newtonmunene99/cursorcade) marketplace, then install **conductor**:
-
-```text
-/add-plugin https://github.com/newtonmunene99/cursorcade
-```
-
-Then install **conductor** from the marketplace panel.
-
-## Uninstall
-
-```text
-/remove-plugin conductor
-```
-
-This unregisters the plugin from Cursor. Project files under `.cursor/` are not removed.
-
-Alternatively: **Dashboard → Settings → Plugins** → disable or uninstall **conductor**.
-
-For local symlinks: `rm ~/.cursor/plugins/local/conductor`, then reload Cursor.
-
 ## Commands
 
 | Command | Description |
 | :------ | :---------- |
 | `/conductor-setup` | One-time project bootstrap |
-| `/conductor-new-track` | Brainstorm, spec, and detailed Cursor plan for a new track |
-| `/conductor-implement` | Execute plan todos |
+| `/conductor-new-track` | Brainstorm, spec, plan (single track or **programme mode**) |
+| `/conductor-implement` | Execute plan todos (respects `depends_on`) |
 | `/conductor-status` | Show progress |
 | `/conductor-revert` | Git-aware revert |
-| `/conductor-review` | Review against guidelines, plan, spec, and documentation |
+| `/conductor-review` | Review against guidelines, plan, spec |
+| `/conductor-programme-review` | Review multi-track programme |
+| `/conductor-validate-review` | Validate review findings against repo |
+| `/conductor-prototype` | Decision-track spike on `spike/<slug>` branch |
 
-## What you get
+## Programme mode
 
-- Persistent context via `rules/conductor.mdc`
-- Project artifacts under `.cursor/context/`, `.cursor/specs/`, `.cursor/plans/`
-- Cursor-native plan frontmatter with `todos` and `status` fields
+From `.cursor/reviews/*.md` → validate → split tracks → synthesis → implement in order.
 
-## Templates
+Reference: `docs/examples/remediation-programme-example.md`
 
-Bundled under `templates/`:
+## Decision tracks
 
-- `workflow.md` — Default TDD workflow (copied to `.cursor/context/workflow.md` on setup)
-- `output-style.md` — Action-first agent output rules (plugin reference, not copied on setup)
-- `plan-authoring-guide.md` — Plan quality rules and mandatory sync todos (plugin reference, not copied on setup)
-- `code_styleguides/` — Language style guides (copied to `.cursor/context/code_styleguides/`)
+Deliverable is an **OKF concept** in a **repo knowledge bundle**:
 
-When running setup, locate templates from the installed plugin path (`~/.cursor/plugins/local/conductor/templates/` or plugin cache).
+| Scope | Bundle root | Example deliverable |
+| ----- | ----------- | ------------------- |
+| Domain package | `<pkg>/knowledge/` | `<pkg>/knowledge/decisions/<slug>.md` |
+| Repository | `knowledge/` | `knowledge/decisions/<slug>.md` |
+
+Workflow: `/grilling` → `/research` → `/conductor-prototype` → `/grill-with-docs`
+
+See [OKF v0.1](https://github.com/GoogleCloudPlatform/knowledge-catalog/blob/main/okf/SPEC.md).
+
+## Project docs / knowledge requests
+
+1. Discover existing `**/knowledge/index.md` bundles
+2. Prefer repo-root `knowledge/` or domain `<pkg>/knowledge/` beside code
+3. Scaffold from `templates/knowledge/bundle-placement-guide.md`
+
+## Artifacts
+
+- **Conductor:** `.cursor/context/`, `.cursor/specs/`, `.cursor/plans/`, `.cursor/reviews/`
+- **OKF knowledge:** `knowledge/` or `<pkg>/knowledge/` in the repository
 
 ## Attribution
 
-Conductor is derived from [gemini-cli-extensions/conductor](https://github.com/gemini-cli-extensions/conductor), the original Conductor extension for Gemini CLI. That project acknowledges [Keith Ballington's .conductor](https://github.com/keithballinger/.conductor) as groundwork.
+Conductor from [gemini-cli-extensions/conductor](https://github.com/gemini-cli-extensions/conductor). OKF from [Google Cloud OKF spec](https://github.com/GoogleCloudPlatform/knowledge-catalog/blob/main/okf/SPEC.md). Engineering skills from [mattpocock/skills](https://github.com/mattpocock/skills) (MIT).
 
-This Cursor adaptation repackages Conductor as a plugin (rules, skills, commands) with project artifacts under `.cursor/context/`, `.cursor/specs/`, and `.cursor/plans/`.
+**Output style:** Base rules come from **[i-have-adhd](../i-have-adhd/)** (`skills/i-have-adhd/SKILL.md`). Conductor-only command formats live in `templates/output-style.md`. Install both plugins from the marketplace; run `/i-have-adhd` for session-wide formatting on non-Conductor work.

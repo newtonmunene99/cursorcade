@@ -24,7 +24,9 @@ Then install the plugins you want from the marketplace panel.
 
 | Plugin | Description |
 | :----- | :---------- |
-| [**conductor**](plugins/conductor/) | Context-driven development: setup, spec, plan, implement, review, and revert |
+| [**conductor**](plugins/conductor/) | Context-driven development: setup, spec, plan, implement, review, programmes, decision tracks |
+| [**engineering**](plugins/engineering/) | Grilling, research, prototype, architecture review (pairs with Conductor decision tracks) |
+| [**i-have-adhd**](plugins/i-have-adhd/) | Session-wide ADHD-friendly output — action first, numbered steps ([upstream](https://github.com/ayghri/i-have-adhd)) |
 
 See each plugin's README for commands, usage, and uninstall instructions.
 

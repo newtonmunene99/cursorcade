@@ -14,7 +14,7 @@ description: Execute tasks from a track's Cursor plan
 
 ## Output Style
 
-Follow **Agent Output Style** in the Conductor rule. Resolve `templates/output-style.md` for full rules.
+Follow **Agent Output Style** in the Conductor rule — **i-have-adhd** skill for base rules; `templates/output-style.md` for `/conductor-implement` format.
 
 **Implement-specific:** Each progress message = (1) what now works, (2) task N/M + track name, (3) next todo. On errors: file:line, cause, fix. On track complete: lead with shipped outcome, then cleanup via `AskQuestion` only.
 
@@ -112,8 +112,9 @@ CRITICAL: You must validate the success of every tool call. If any tool call fai
                 - **question:** "I couldn't find a unique track matching the name you provided. Did you mean '<next_available_track>'? Or please type the exact track name."
                 - **type:** "text"
     -   **If no track name was provided (or if the previous step failed):**
-        1.  **Identify Next Track:** Find the first track in the parsed tracks file that is NOT marked as `[x] Completed`.
-        2.  **If a next track is found:**
+        1.  **Identify Next Track:** Find the first track in the parsed tracks file that is NOT marked as `[x] Completed` **and** whose `depends_on` tracks (from `metadata.json`) are all marked `[x]` complete.
+        2.  **Dependency check:** For each candidate track, read `.cursor/specs/<track_id>/metadata.json`. If any `depends_on` track is not `[x]` in **Tracks Registry**, skip that track and try the next incomplete track. If all incomplete tracks are blocked, announce which `depends_on` must complete first (cite sequencing table row if present).
+        3.  **If a next eligible track is found:**
             -   Immediately call the `AskQuestion` tool to confirm the selection (do not repeat the question in the chat):
                 - **questions:**
                     - **header:** "Next Track"
@@ -127,6 +128,9 @@ CRITICAL: You must validate the success of every tool call. If any tool call fai
         3.  **If no incomplete tracks are found:**
             -   Announce: "No incomplete tracks found in the tracks file. All tasks are completed!"
             -   Halt the process and await further user instructions.
+        4.  **If incomplete tracks exist but all are blocked by dependencies:**
+            -   Announce: "All incomplete tracks are blocked. Complete `<track_id>` first (see sequencing table in tracks.md)."
+            -   Halt and await user instructions.
 
 5.  **Handle No Selection:** If no track is selected, inform the user and await further instructions.
 
@@ -155,7 +159,7 @@ CRITICAL: You must validate the success of every tool call. If any tool call fai
     b. **Iterate Through Tasks:** Loop each todo in frontmatter order. Track whether **Git Isolation** has run this session (`git_isolation_done`).
     c. **For Each Task:**
         i. **`conductor-sync-in-progress`:** Update registry `[~]`, metadata `in_progress`, refresh `updated_at`. Mark todo `completed`. Follow **Git Write Policy** for any commit. Then run **Git Isolation** per step d if not yet done.
-        ii. **`conductor-sync-complete`:** Update registry `[x]`, metadata `completed`, refresh `updated_at`. Mark todo `completed`. Follow **Git Write Policy** to commit Conductor files.
+        ii. **`conductor-sync-complete`:** For decision tracks (`track_role: decision` in metadata), verify no `spike/*` branch exists (`git branch --list 'spike/*'`). If spike branch exists, halt — run `/conductor-prototype` delete step first. Update registry `[x]`, metadata `completed`, refresh `updated_at`. Mark todo `completed`. Follow **Git Write Policy** to commit Conductor files.
         iii. **All other todos:** Before the first implementation todo, if sync-in-progress is satisfied (registry `[~]`) and **Git Isolation** has not run, execute step d. Then follow the **Workflow** task lifecycle.
            - **CRITICAL:** Human-in-the-loop steps in the **Workflow** MUST use `AskQuestion`.
            - **On test failure:** Follow the **Systematic Debugging Protocol** in the **Workflow**.

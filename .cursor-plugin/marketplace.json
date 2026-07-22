@@ -5,7 +5,7 @@
   },
   "metadata": {
     "description": "A curated arcade of Cursor plugins for developers who mean business.",
-    "version": "1.0.1",
+    "version": "1.1.0",
     "logo": "assets/logo.svg"
   },
   "plugins": [
@@ -13,6 +13,16 @@
       "name": "conductor",
       "source": "./plugins/conductor",
       "description": "Context-Driven Development: setup, spec, plan, implement, review."
+    },
+    {
+      "name": "engineering",
+      "source": "./plugins/engineering",
+      "description": "Engineering skills: grilling, research, prototype, architecture review."
+    },
+    {
+      "name": "i-have-adhd",
+      "source": "./plugins/i-have-adhd",
+      "description": "ADHD-friendly output: action first, numbered steps, session-wide formatting."
     }
   ]
 }

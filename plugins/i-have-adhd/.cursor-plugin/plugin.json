@@ -1,0 +1,19 @@
+{
+  "name": "i-have-adhd",
+  "displayName": "I Have ADHD",
+  "version": "1.0.0",
+  "description": "ADHD-friendly agent output: action first, numbered steps, no buried answers.",
+  "author": {
+    "name": "ayghri",
+    "email": ""
+  },
+  "homepage": "https://github.com/ayghri/i-have-adhd",
+  "repository": "https://github.com/ayghri/i-have-adhd",
+  "license": "MIT",
+  "keywords": [
+    "adhd",
+    "productivity",
+    "output-style",
+    "formatting"
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "name": "engineering",
+  "displayName": "Engineering",
+  "version": "1.0.0",
+  "description": "Matt Pocock engineering skills adapted for Cursor: grilling, research, prototype, architecture review, and domain modeling.",
+  "author": {
+    "name": "newtonmunene99",
+    "email": "newtonmunene99@gmail.com"
+  },
+  "homepage": "https://github.com/newtonmunene99/cursorcade",
+  "repository": "https://github.com/newtonmunene99/cursorcade",
+  "license": "MIT",
+  "keywords": [
+    "engineering",
+    "grilling",
+    "prototype",
+    "architecture",
+    "cursor"
+  ]
+}

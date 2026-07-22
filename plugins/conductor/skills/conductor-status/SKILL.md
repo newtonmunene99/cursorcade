@@ -14,7 +14,7 @@ description: Display project and track progress
 
 ## Output Style
 
-Follow **Agent Output Style** in the Conductor rule. Resolve `templates/output-style.md` for full rules.
+Follow **Agent Output Style** in the Conductor rule — **i-have-adhd** skill for base rules; `templates/output-style.md` for status format.
 
 **Status-specific:** Line 1 = next action (`/conductor-implement <track>` or the pending todo). Then max 5 bullets: track + task N/M, progress fraction, blockers (if any), verdict (On track | Behind | Blocked).
 

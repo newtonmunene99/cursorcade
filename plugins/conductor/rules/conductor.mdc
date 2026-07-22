@@ -37,6 +37,12 @@ To find a file (e.g., "**Product Definition**") within a specific context (Proje
 - **Workflow**: `.cursor/context/workflow.md`
 - **Product Guidelines**: `.cursor/context/product-guidelines.md`
 - **Tracks Registry**: `.cursor/context/tracks.md`
+- **Backlog**: `.cursor/context/backlog.md`
+- **Reviews Directory**: `.cursor/reviews/`
+- **Review document**: `.cursor/reviews/<slug>_YYYYMMDD-review.md`
+- **Knowledge Bundle (OKF)**: resolve per **Knowledge Bundle Resolution** below — typically `knowledge/` at repo root or `<pkg>/knowledge/`. Not `.cursor/knowledge/` by default.
+- **Decision concept**: `<bundle-root>/decisions/<slug>.md` (OKF concept ID: `decisions/<slug>`)
+- **Decision evidence**: `<bundle-root>/decisions/evidence/<slug>.md`
 - **Specs Directory**: `.cursor/specs/`
 - **Plans Directory**: `.cursor/plans/`
 - **Archive Directory**: `.cursor/archive/`
@@ -46,6 +52,26 @@ To find a file (e.g., "**Product Definition**") within a specific context (Proje
 - **Implementation Plan**: `.cursor/plans/<plan_filename>.plan.md` (linked from Tracks Registry)
 - **Metadata**: `.cursor/specs/<track_id>/metadata.json`
 
+**Track `metadata.json` optional fields** (programme tracks):
+
+- `programme_id` — slug linking tracks in one remediation programme
+- `order` — integer sequence (1, 2, 3; parallel tracks may share order with `∥` in table)
+- `depends_on` — array of `track_id` values that must be `[x]` before implement
+- `blocks` — array of `track_id` values this track gates
+- `track_role` — `implementation` | `decision` | `docs`
+- `deliverable` — for decision tracks: OKF concept path within resolved bundle (e.g. `<pkg>/knowledge/decisions/<slug>.md` or `knowledge/decisions/<slug>.md`)
+
+## Knowledge Bundle Resolution
+
+**PROTOCOL:** When writing or reading OKF knowledge (project docs, domain docs, decision deliverables):
+
+1. **Discover** existing bundles: `**/knowledge/index.md` in the repo (exclude `.git`).
+2. **Match scope** to track spec, review **Scope**, or user-stated module → use `<module>/knowledge/`.
+3. **Repo-wide** knowledge → use `knowledge/` at repository root.
+4. **Fallback** `.cursor/knowledge/` only when no domain applies and user confirms.
+
+Load `templates/knowledge/bundle-placement-guide.md` from the Conductor plugin for scaffold and concept types. Link discovered bundles from `.cursor/context/index.md` — knowledge lives **in the repo beside code**, not only under `.cursor/`.
+
 ## Cursor Plan Format
 
 Implementation plans use Cursor-native frontmatter in `.cursor/plans/*.plan.md`:
@@ -54,6 +80,9 @@ Implementation plans use Cursor-native frontmatter in `.cursor/plans/*.plan.md`:
 ---
 name: Track Title
 overview: One-paragraph summary
+depends_on: [track_id]
+blocks: [track_id]
+programme_id: remediation_slug
 todos:
   - id: conductor-sync-in-progress
     content: "Conductor — Mark track in progress (tracks.md [~], metadata.json in_progress)"
@@ -61,6 +90,8 @@ todos:
   - id: task-id
     content: "Task description"
     status: pending
+    phase: C4
+    blocked_by: [prerequisite-task-id]
   - id: conductor-sync-complete
     content: "Conductor — Mark track complete (tracks.md [x], metadata.json completed)"
     status: pending
@@ -69,6 +100,8 @@ isProject: true
 ```
 
 Frontmatter `todos` are the source of truth for implement, status, and revert. Append commit SHAs to `content` on completion.
+
+Optional plan-level fields: `depends_on`, `blocks`, `programme_id`. Optional todo-level fields: `phase`, `blocked_by`. Cursor UI may ignore unknown fields — they remain for agent protocol and programme review.
 
 **Mandatory sync bookends** — every generated plan MUST include:
 
@@ -127,7 +160,11 @@ When starting track implementation (`/conductor-implement`) or executing a plan 
 
 ## Agent Output Style
 
-All Conductor commands and skills MUST shape user-facing messages for action-first reading. Full rules: resolve `templates/output-style.md` from the installed Conductor plugin (same lookup order as skills).
+All Conductor commands and skills MUST shape user-facing messages for action-first reading.
+
+**Base rules:** Resolve the **i-have-adhd** skill from the Cursorcade **i-have-adhd** plugin (`skills/i-have-adhd/SKILL.md`) when installed. If not installed, apply the summary below.
+
+**Conductor-specific formats:** Resolve `templates/output-style.md` from the installed Conductor plugin (command layouts, plan authoring).
 
 **Every message:**
 
@@ -140,4 +177,4 @@ All Conductor commands and skills MUST shape user-facing messages for action-fir
 7. **End with one next step** — one thing doable in under two minutes (or end cleanly when done)
 8. **No preamble or closers** — no "Great question", "Hope this helps", "Let me know if..."
 
-Use `AskQuestion` for structured prompts; do not repeat the same question in chat. Command-specific output formats live in `templates/output-style.md` and in each skill's output section.
+Use `AskQuestion` for structured prompts; do not repeat the same question in chat. Command-specific output formats live in `templates/output-style.md` and in each skill's output section. Optional: `/i-have-adhd` for session-wide formatting beyond Conductor commands.

@@ -14,7 +14,7 @@ description: Create a new track with brainstorm, spec, and Cursor plan
 
 ## Output Style
 
-Follow **Agent Output Style** in the Conductor rule. Resolve `templates/output-style.md` for full rules.
+Follow **Agent Output Style** in the Conductor rule — **i-have-adhd** skill for base rules; `templates/output-style.md` for setup/new-track format.
 
 **New-track-specific:** Line 1 = current phase (brainstorm | spec | plan) and the one thing the user should do. Restate approved design in ≤5 bullets before drafting spec. On completion: "Run `/conductor-implement` on `<track_id>`."
 
@@ -100,6 +100,31 @@ CRITICAL: You must validate the success of every tool call. If any tool call fai
     *   **If `{{args}}` contains a description:**
         1. Use the content of `{{args}}` as the track description.
         2. **Infer Track Type:** Analyze the description to determine if it is a "Feature" or "Something Else" (e.g., Bug, Chore, Refactor). Do NOT ask the user to classify it.
+
+### 2.1b Programme detection
+
+After loading the track description, check for **programme mode**:
+
+| Signal | Action |
+| ------ | ------ |
+| User references `.cursor/reviews/*.md` | Enter programme mode |
+| Paste includes numbered findings (§3.x, ARCH-N, Addendum) | Enter programme mode |
+| Description mentions "remediation", "review findings", or lists ≥6 distinct items | Enter programme mode |
+| Otherwise | Continue single-track flow (§2.2) |
+
+**Programme mode protocol:**
+
+1. Resolve and read the review document via **Reviews Directory** (Universal File Resolution).
+2. Check for validation addendum (`<review-stem>_validation.md`) or validation section. If missing, announce: "Run `/conductor-validate-review` first" and call `AskQuestion` — opt out only if user explicitly accepts unvalidated programme.
+3. Load `templates/programme-planning-guide.md` from **Plugin Template Path**.
+4. Count findings and classify axes (trust, lifecycle, registry, docs, architecture).
+5. **Split vs monolith** — `AskQuestion`:
+   - **header:** "Programme split"
+   - **type:** choice
+   - **options:** Split into N tracks (recommended when ≥6 findings or ≥3 axes) | Single monolith track | Custom split (user describes)
+6. If ARCH-N findings block future refactors, include a **decision track** (see §2.5b).
+7. Optional: suggest `/improve-codebase-architecture` (engineering plugin) for architecture deepening before split.
+8. Skip §2.2–2.4 single-track loops; use **§2.3p Programme specs**, **§2.4p Programme plans**, **§2.4b Programme synthesis**, then **§2.5p Programme artifacts**.
 
 ### 2.2 Brainstorm and Design
 
@@ -200,6 +225,7 @@ Skip multi-approach design. Use **one question per `AskQuestion` call** to cover
     *   **CRITICAL: Mandatory sync bookends.** First todo MUST be `conductor-sync-in-progress`; last todo MUST be `conductor-sync-complete`. Do NOT inject git-isolation todos unless the user explicitly requested one during planning.
     *   **CRITICAL: Inject Phase Completion Tasks.** If workflow defines "Phase Completion Verification and Checkpointing Protocol", add a todo per phase: `content: "Conductor - User Manual Verification '<Phase Name>' (Protocol in workflow.md)"`.
     *   **CRITICAL: Plan self-review** per the Plan Authoring Guide before user confirmation.
+    *   **CRITICAL: Path verification** per the Plan Authoring Guide Path verification checklist. Extract paths from `**Files:**` lines; verify with `test -f` / `Read`; record Path verification subsection; **halt on unresolved paths** before user confirmation.
 
 4.  **User Confirmation:**
     -   **Ask for Approval:** Use the `AskQuestion` tool to request confirmation. You MUST embed the drafted content directly into the `question` field so the user can review it in context.
@@ -218,6 +244,54 @@ Skip multi-approach design. Use **one question per `AskQuestion` call** to cover
                 - Label: "Revise", Description: "I want to modify the implementation steps."
     Await user feedback and revise the Cursor plan file content until confirmed.
 
+### 2.3p Programme specification generation
+
+For each track in the approved programme split:
+
+1. Draft `spec.md` from assigned findings (reference review paths and IDs).
+2. Decision tracks: use `templates/decision-track-spec.md` as skeleton.
+3. Run spec self-review (§2.3 step 4) per track.
+4. Batch spec approval via `AskQuestion` per track OR single programme spec review (user choice).
+
+### 2.4p Programme plan generation
+
+For each approved spec:
+
+1. Load **Plan Authoring Guide** and **Workflow**.
+2. Draft plan with sync bookends, path verification, phases when >12 todos.
+3. Decision track plans MUST include todos invoking engineering skills:
+   - `/grilling` — stress-test options
+   - `/research` — evidence gathering
+   - `/conductor-prototype` — spike on `spike/<slug>` branch
+   - `/grill-with-docs` — write OKF decision concept at `<bundle-root>/decisions/<slug>.md`
+4. Do **not** ask Confirm Plan per track yet — proceed to §2.4b synthesis first.
+
+### 2.4b Programme synthesis pass
+
+**CRITICAL:** Run once all draft plans exist, before any Confirm Plan or Confirm Programme.
+
+1. Load `templates/programme-planning-guide.md`.
+2. **Cross-track dedup matrix** — assign single owner per file/function/namespace concern; add **Removed — owned by Track X** stubs to non-owner plans.
+3. **Sequencing edges** — set `programme_id`, `order`, `depends_on`, `blocks`, `track_role` on each track metadata draft.
+4. **Prerequisite scan** — insert `PREREQUISITE:` todos where tests would be vacuous.
+5. **Path verification** — run checklist on every plan; aggregate fix table.
+6. **Sequencing table** — draft programme header from `templates/tracks-programme-header.md`.
+7. **Confirm Programme** — single `AskQuestion` embedding sequencing table, dedup matrix, path fixes, decision/backlog summary.
+8. Revise until approved.
+
+### 2.5b Decision track scaffold (OKF knowledge bundle)
+
+When programme includes a decision track, at artifact write time:
+
+1. **Resolve bundle root** per **Knowledge Bundle Resolution** in the Conductor rule (load `templates/knowledge/bundle-placement-guide.md`). Prefer `<pkg>/knowledge/` from review/track scope; else repo-root `knowledge/`.
+2. If no bundle exists, scaffold from `templates/knowledge/` at the resolved root (`index.md`, `log.md`, `decisions/index.md`).
+3. Link discovered bundle(s) from `.cursor/context/index.md` (e.g. `[<pkg> knowledge](../../<pkg>/knowledge/)` — adjust relative path).
+4. Set `metadata.json`: `"track_role": "decision"`, `"deliverable": "<bundle-root>/decisions/<slug>.md"`.
+5. Add proposed entry to `<bundle-root>/decisions/index.md` and `<bundle-root>/log.md`.
+6. Append backlog gating from `templates/backlog-gating-snippet.md`.
+
+Use `templates/knowledge/decision-concept.md` for the OKF deliverable shape (`type: Architecture Decision`).
+
 ### 2.5 Create Track Artifacts and Update Main Plan
 
 1.  **Check for existing track name:** Before generating a new Track ID, resolve the **Specs Directory** using the **Universal File Resolution Protocol**. List all existing track directories in that resolved path. Extract the short names from these track IDs (e.g., ``shortname_YYYYMMDD`` -> `shortname`). If the proposed short name for the new track (derived from the initial description) matches an existing short name, halt the `newTrack` creation. Explain that a track with that name already exists and suggest choosing a different name or resuming the existing track.
@@ -227,14 +301,20 @@ Skip multi-approach design. Use **one question per `AskQuestion` call** to cover
     ```json
     {
       "track_id": "<track_id>",
-      "type": "feature", // or "bug", "chore", etc.
-      "status": "new", // or in_progress, completed, cancelled
+      "type": "feature",
+      "status": "new",
       "created_at": "YYYY-MM-DDTHH:MM:SSZ",
       "updated_at": "YYYY-MM-DDTHH:MM:SSZ",
-      "description": "<Initial user description>"
+      "description": "<Initial user description>",
+      "programme_id": "<optional programme slug>",
+      "order": 1,
+      "depends_on": [],
+      "blocks": [],
+      "track_role": "implementation",
+      "deliverable": null
     }
     ```
-    *   Populate fields with actual values. Use the current timestamp.
+    *   Populate fields with actual values. Use the current timestamp. Omit programme fields for single tracks.
 5.  **Write Files:**
     *   Write the confirmed specification content to `.cursor/specs/<track_id>/spec.md`.
     *   Write the confirmed plan content to `.cursor/plans/<slug>_<shortid>.plan.md`.
@@ -250,7 +330,8 @@ Skip multi-approach design. Use **one question per `AskQuestion` call** to cover
 
 7.  **Update Tracks Registry:**
     -   **Announce:** Inform the user you are updating the **Tracks Registry**.
-    -   **Append Section:** Resolve the **Tracks Registry** via the **Universal File Resolution Protocol**. Append a new section for the track to the end of this file. The format MUST be:
+    -   **Programme:** Insert programme header (§2.4b) once, then append each track with inline order hint: `— _order N; <hint>_`
+    -   **Single track:** Append section:
         ```markdown
 
         ---
@@ -260,8 +341,17 @@ Skip multi-approach design. Use **one question per `AskQuestion` call** to cover
           *Plan: [../plans/<slug>_<shortid>.plan.md](../plans/<slug>_<shortid>.plan.md)*
         ```
 8.  **Commit Conductor Files:**
-    -   Follow the **Git Write Policy** in the Conductor rule for all files created or modified in this workflow (spec, plan, index, metadata, **Tracks Registry**).
-    -   Suggested message: `chore(conductor): Add new track '<track_description>'`.
-9.  **Announce Completion:** One line: "Track `<track_id>` ready. Next: run `/conductor-implement`."
+    -   Follow the **Git Write Policy** in the Conductor rule for all files created or modified in this workflow (spec, plan, index, metadata, **Tracks Registry**, OKF knowledge scaffold, backlog).
+    -   Suggested message: `chore(conductor): Add new track '<track_description>'` or `chore(conductor): Add remediation programme '<programme_id>'`.
+9.  **Announce Completion:** One line: "Track `<track_id>` ready. Next: run `/conductor-implement`." For programmes: list track order and first implementable track (lowest `order` with satisfied `depends_on`).
+
+### 2.5p Programme artifacts write loop
+
+After Confirm Programme, for each track in sequence:
+
+1. Run §2.5 steps 1–5 (check name, track ID, directory, metadata with programme fields, write files).
+2. Run §2.5b if decision track.
+3. Append track entry under programme header in `tracks.md`.
+4. Single commit for entire programme preferred (Git Write Policy applies once).
 
 

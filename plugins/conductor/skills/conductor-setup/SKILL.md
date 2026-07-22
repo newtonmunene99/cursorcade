@@ -14,7 +14,7 @@ description: Scaffold project and set up the Conductor environment
 
 ## Output Style
 
-Follow **Agent Output Style** in the Conductor rule. Resolve `templates/output-style.md` for full rules.
+Follow **Agent Output Style** in the Conductor rule — **i-have-adhd** skill for base rules; `templates/output-style.md` for setup format.
 
 **Setup-specific:** Line 1 = current step and what to do now (answer the pending `AskQuestion`, or the command to run). State "Step N of 7" when resuming. No welcome preambles.
 
@@ -260,7 +260,7 @@ CRITICAL: You must validate the success of every tool call. If a tool call fails
         -   **Interaction Flow:** Wait for the user's response, then proceed to the next step.
 
 4.  **Draft the Document:** Once the dialogue is complete (or "Autogenerate" was selected), generate the content for `product-guidelines.md`.
-    -   **If user chose "Autogenerate":** Use your best judgment to infer standard, high-quality guidelines suitable for the project type. Include an **Agent Communication** section: action-first responses, numbered steps, restated progress each turn, no preamble/closers (align with `templates/output-style.md`).
+    -   **If user chose "Autogenerate":** Use your best judgment to infer standard, high-quality guidelines suitable for the project type. Include an **Agent Communication** section: action-first responses, numbered steps, restated progress each turn, no preamble/closers (align with **i-have-adhd** skill).
     -   **If user chose "Interactive":** Use the specific answers provided. The source of truth is **only the user's selected answer(s)**. You are encouraged to expand on these choices to create a polished output.
 5.  **User Confirmation Loop:**
     -   **Ask for Approval:** Use the `AskQuestion` tool to request confirmation. You MUST embed the drafted content directly into the `question` field so the user can review it in context.
@@ -441,9 +441,14 @@ CRITICAL: You must validate the success of every tool call. If a tool call fails
 
         ## Management
         - [Tracks Registry](./tracks.md)
-        - [Specs Directory](./tracks/)
+        - [Backlog](./backlog.md)
+        - [Reviews](../reviews/)
+        - [Knowledge](../knowledge/) — link to repo OKF bundle when present; add domain bundle links as discovered (e.g. `../../<pkg>/knowledge/`)
+        - [Specs Directory](../specs/)
         ```
-    -   **Announce:** "Created `.cursor/context/index.md` to serve as the project context index."
+    -   **Create Reviews directory:** Copy `templates/reviews/README.md` to `.cursor/reviews/README.md` (create directory if missing).
+    -   **Announce:** "Created `.cursor/context/index.md` and `.cursor/reviews/`."
+    -   **Knowledge:** Do not scaffold `.cursor/knowledge/` by default. On setup, discover repo `knowledge/` or `<module>/knowledge/` bundles and link from `index.md`. Offer to scaffold repo-root `knowledge/` via `AskQuestion` when user asks for project docs.
 
 2.  **Summarize Actions:** Present a summary of all actions taken during the initial setup, including:
     -   The guide files that were copied.
@@ -551,6 +556,7 @@ CRITICAL: You must validate the success of every tool call. If a tool call fails
             - **CRITICAL: Mandatory sync bookends.** First todo MUST be `conductor-sync-in-progress`; last todo MUST be `conductor-sync-complete`. Do NOT inject git-isolation todos unless the user explicitly requested one.
             - **CRITICAL: Inject Phase Completion Tasks.** If workflow defines "Phase Completion Verification and Checkpointing Protocol", add a todo per phase: `content: "Conductor - User Manual Verification '<Phase Name>' (Protocol in workflow.md)"`.
             - **CRITICAL: Plan self-review** per the Plan Authoring Guide before writing the file.
+            - **CRITICAL: Path verification** per the Plan Authoring Guide Path verification checklist before writing the file. Halt on unresolved paths.
     c. **Create Track Artifacts:**
         i. **Generate and Store Track ID:** Create a unique Track ID from the track description using format `shortname_YYYYMMDD` and store it. You MUST use this exact same ID for all subsequent steps for this track.
         ii. **Create Single Directory:** Resolve the **Specs Directory** via the **Universal File Resolution Protocol** and create a single new directory: `.cursor/specs/<track_id>/`.

@@ -14,7 +14,7 @@ description: Git-aware revert of track, phase, or task
 
 ## Output Style
 
-Follow **Agent Output Style** in the Conductor rule. Resolve `templates/output-style.md` for full rules.
+Follow **Agent Output Style** in the Conductor rule — **i-have-adhd** skill for base rules; `templates/output-style.md` for revert format.
 
 **Revert-specific:** Line 1 = revert target + commit count. Numbered execution plan before any git write. Errors: SHA, cause, manual fix step. Completion: one line — what was reverted and plan state now.
 

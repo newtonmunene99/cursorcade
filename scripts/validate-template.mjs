@@ -345,7 +345,7 @@ async function main() {
     await validateComponentFrontmatter(pluginDir, entry.name);
 
     const planAuthoringGuide = path.join(pluginDir, "templates", "plan-authoring-guide.md");
-    if (!(await pathExists(planAuthoringGuide))) {
+    if (entry.name === "conductor" && !(await pathExists(planAuthoringGuide))) {
       addError(`${entry.name}: missing templates/plan-authoring-guide.md (referenced by skills and rules).`);
     }
 
