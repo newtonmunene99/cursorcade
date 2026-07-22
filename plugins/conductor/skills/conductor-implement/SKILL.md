@@ -16,7 +16,7 @@ description: Execute tasks from a track's Cursor plan
 
 Follow **Agent Output Style** in the Conductor rule — **i-have-adhd** skill for base rules; `templates/output-style.md` for `/conductor-implement` format.
 
-**Implement-specific:** Each progress message = (1) what now works, (2) task N/M + track name, (3) next todo. On errors: file:line, cause, fix. On track complete: lead with shipped outcome, then cleanup via `AskQuestion` only.
+**Implement-specific:** Each progress message = (1) what now works, (2) task N/M + track name, (3) next todo. On errors: file:line, cause, fix. On track complete: lead with shipped outcome, then §5.0 cleanup `AskQuestion` — include combined continue options when eligible next tracks exist (user must choose; never auto-advance).
 
 ## Plugin Template Path
 
@@ -98,39 +98,32 @@ CRITICAL: You must validate the success of every tool call. If any tool call fai
 
 3.  **Continue:** Immediately proceed to the next step to select a track.
 
-4.  **Select Track:**
+4.  **Select Track (Eligible Tracks Protocol):**
     -   **If a track name was provided:**
         1.  Perform an exact, case-insensitive match for the provided name against the track descriptions you parsed.
-        2.  If a unique match is found, immediately call the `AskQuestion` tool to confirm the selection (do not repeat the question in the chat):
+        2.  Resolve `<track_id>` and read `metadata.json`. If any `depends_on` track is not `[x]`, announce: "Track '<track_description>' is blocked. Complete `<missing_track_id>` first." Then call `AskQuestion` to pick from **eligible** tracks (see below) or halt.
+        3.  If a unique match is found and not blocked, immediately call the `AskQuestion` tool to confirm the selection (do not repeat the question in the chat):
             - **questions:**
                 - **header:** "Confirm"
                 - **question:** "I found track '<track_description>'. Is this correct?"
                 - **type:** "yesno"
-        3.  If no match is found, or if the match is ambiguous, immediately call the `AskQuestion` tool to inform the user and request the correct track name (do not repeat the question in the chat):
+        4.  If no match is found, or if the match is ambiguous, immediately call the `AskQuestion` tool to inform the user and request the correct track name (do not repeat the question in the chat):
             - **questions:**
                 - **header:** "Clarify"
                 - **question:** "I couldn't find a unique track matching the name you provided. Did you mean '<next_available_track>'? Or please type the exact track name."
                 - **type:** "text"
     -   **If no track name was provided (or if the previous step failed):**
-        1.  **Identify Next Track:** Find the first track in the parsed tracks file that is NOT marked as `[x] Completed` **and** whose `depends_on` tracks (from `metadata.json`) are all marked `[x]` complete.
-        2.  **Dependency check:** For each candidate track, read `.cursor/specs/<track_id>/metadata.json`. If any `depends_on` track is not `[x]` in **Tracks Registry**, skip that track and try the next incomplete track. If all incomplete tracks are blocked, announce which `depends_on` must complete first (cite sequencing table row if present).
-        3.  **If a next eligible track is found:**
-            -   Immediately call the `AskQuestion` tool to confirm the selection (do not repeat the question in the chat):
-                - **questions:**
-                    - **header:** "Next Track"
-                    - **question:** "No track name provided. Would you like to proceed with the next incomplete track: '<track_description>'?"
-                    - **type:** "yesno"
-            -   If confirmed, proceed with this track. Otherwise, immediately call the `AskQuestion` tool to request the correct track name (do not repeat the question in the chat):
-                - **questions:**
-                    - **header:** "Clarify"
-                    - **question:** "Please type the exact name of the track you would like to implement."
-                    - **type:** "text"
-        3.  **If no incomplete tracks are found:**
-            -   Announce: "No incomplete tracks found in the tracks file. All tasks are completed!"
-            -   Halt the process and await further user instructions.
-        4.  **If incomplete tracks exist but all are blocked by dependencies:**
-            -   Announce: "All incomplete tracks are blocked. Complete `<track_id>` first (see sequencing table in tracks.md)."
-            -   Halt and await user instructions.
+        1.  **Compute eligible tracks** per **Eligible Tracks Protocol** in the Conductor rule.
+        2.  **If no incomplete tracks:** Announce: "No incomplete tracks found. All tasks are completed!" and halt.
+        3.  **If incomplete tracks exist but none are eligible:** Announce: "All incomplete tracks are blocked. Complete `<track_id>` first (see sequencing table in tracks.md)." and halt.
+        4.  **If exactly one eligible track:** Call `AskQuestion`:
+            - **questions:**
+                - **header:** "Next Track"
+                - **question:** "Next eligible track: '<track_description>'. Proceed?"
+                - **type:** "yesno"
+            - If declined, call `AskQuestion` `text` for exact track name.
+        5.  **If multiple eligible tracks:** Call `AskQuestion` `choice` — one option per eligible track (label = track description; note **Parallel-ready** in description when sharing lowest `order`). Include option **Stop for now**. Put lowest-`order` track first (Recommended).
+            - If user picks a track, proceed. If **Stop for now**, halt.
 
 5.  **Handle No Selection:** If no track is selected, inform the user and await further instructions.
 
@@ -156,14 +149,14 @@ CRITICAL: You must validate the success of every tool call. If any tool call fai
 
 4.  **Execute Tasks and Update Track Plan:**
     a. **Announce:** One line: executing plan todos per **Workflow** (task index when known).
-    b. **Iterate Through Tasks:** Loop each todo in frontmatter order. Track whether **Git Isolation** has run this session (`git_isolation_done`).
+    b. **Iterate Through Tasks:** Loop each todo in frontmatter order. Track whether **Git Isolation** has run for the **current track** (`git_isolation_done`).
     c. **For Each Task:**
         i. **`conductor-sync-in-progress`:** Update registry `[~]`, metadata `in_progress`, refresh `updated_at`. Mark todo `completed`. Follow **Git Write Policy** for any commit. Then run **Git Isolation** per step d if not yet done.
         ii. **`conductor-sync-complete`:** For decision tracks (`track_role: decision` in metadata), verify no `spike/*` branch exists (`git branch --list 'spike/*'`). If spike branch exists, halt — run `/conductor-prototype` delete step first. Update registry `[x]`, metadata `completed`, refresh `updated_at`. Mark todo `completed`. Follow **Git Write Policy** to commit Conductor files.
         iii. **All other todos:** Before the first implementation todo, if sync-in-progress is satisfied (registry `[~]`) and **Git Isolation** has not run, execute step d. Then follow the **Workflow** task lifecycle.
            - **CRITICAL:** Human-in-the-loop steps in the **Workflow** MUST use `AskQuestion`.
            - **On test failure:** Follow the **Systematic Debugging Protocol** in the **Workflow**.
-    d. **Git Isolation (once per session):** After sync-in-progress is satisfied and **before** any implementation todo or other Git write, follow the **Git Isolation Protocol** in the Conductor rule. Set `git_isolation_done` after completing. Also run after step 3 legacy sync if the plan has no sync-in-progress todo.
+    d. **Git Isolation (once per track):** After sync-in-progress is satisfied and **before** any implementation todo or other Git write, follow the **Git Isolation Protocol** in the Conductor rule. Set `git_isolation_done` after completing. Reset `git_isolation_done = false` when starting a new track via §5.0 continue options. Also run after step 3 legacy sync if the plan has no sync-in-progress todo.
 
 5.  **Legacy Finalize Fallback (only when the plan has no `conductor-sync-complete` todo, or it remains pending after the loop):**
     -   Update **Tracks Registry** `[~]` → `[x]` and metadata `completed` if not already done.
@@ -243,45 +236,72 @@ CRITICAL: You must validate the success of every tool call. If any tool call fai
 ---
 
 ## 5.0 TRACK CLEANUP
-**PROTOCOL: Offer to archive or delete the completed track.**
+**PROTOCOL: Offer cleanup and optional continue to the next eligible track in one confirmed choice.**
 
 1.  **Execution Trigger:** This protocol MUST only be executed after the current track has been successfully implemented and the `SYNCHRONIZE PROJECT DOCUMENTATION` step is complete.
 
-2.  **Ask for User Choice:** Immediately call the `AskQuestion` tool to prompt the user (do not repeat the question in the chat):
+2.  **Compute next tracks:** Apply **Eligible Tracks Protocol** in the Conductor rule **before** prompting. Record eligible `<track_id>` + description list; note **parallel-ready** (∥) when multiple share lowest `order`.
+
+3.  **Ask for User Choice:** Build options dynamically, then call `AskQuestion` (do not repeat in chat):
+
+    **Always include:**
+    - **Review** — Run `/conductor-review` before finalizing.
+    - **Archive** — Move track folder to `.cursor/archive/`, remove from tracks file.
+    - **Delete** — Permanently delete track folder and registry entry.
+    - **Skip** — Leave completed track in tracks file; stop for now.
+
+    **When eligible next tracks exist**, append combined options (user must explicitly choose — never auto-continue):
+    - For each eligible track (cap at **2** in this prompt; if more than 2 eligible, include only the two lowest-`order` tracks here):
+        - Label: `Skip and continue to <track_id>`, Description: `<track_description>` + `(∥)` when parallel-ready. Leave completed track in registry; start implementing next track.
+        - Label: `Archive and continue to <track_id>`, Description: Archive completed track, then implement `<track_description>`.
+    - If **>2 eligible** tracks, also add:
+        - Label: `Choose next track…`, Description: Pick among all eligible tracks (follow-up `AskQuestion`).
+
+    Put the **recommended** next track (lowest `order`) first among continue options.
+
     - **questions:**
         - **header:** "Track Cleanup"
-        - **question:** "Track '<track_description>' is now complete. What would you like to do?"
+        - **question:** "Track '<track_description>' is complete. What would you like to do?" + if eligible exist: append one line listing eligible ids.
         - **type:** "choice"
         - **multiSelect:** false
-        - **options:**
-            - Label: "Review", Description: "Run the review command to verify changes before finalizing."
-            - Label: "Archive", Description: "Move the track's folder to `.cursor/archive/` and remove it from the tracks file."
-            - Label: "Delete", Description: "Permanently delete the track's folder and remove it from the tracks file."
-            - Label: "Skip", Description: "Do nothing and leave it in the tracks file."
 
-3.  **Handle User Response:**
-    *   **If user chooses "Review":**
-        *   Announce: "Please run `/conductor-review` to verify your changes. You will be able to archive or delete the track after the review."
-    *   **If user chooses "Archive":**
-        i.   **Create Archive Directory:** Check for the existence of `.cursor/archive/`. If it does not exist, create it.
-        ii.  **Archive Track Folder:** Move the track's folder from its current location (resolved via the **Specs Directory**) to `.cursor/archive/<track_id>`.
-        iii. **Remove from Tracks File:** Read the content of the **Tracks Registry** file, remove the entire section for the completed track (the part that starts with `---` and contains the track description), and write the modified content back to the file.
-        iv.  **Commit Conductor Files:** Follow the **Git Write Policy** in the Conductor rule before staging and committing. Suggested message: `chore(conductor): Archive track '<track_description>'`.
-        v.   **Announce Success:** Announce: "Track '<track_description>' has been successfully archived."
-    *   **If user chooses "Delete":**
-        i. **CRITICAL WARNING:** Before proceeding, immediately call the `AskQuestion` tool to ask for final confirmation (do not repeat the warning in the chat):
-            - **questions:**
-                - **header:** "Confirm"
-                - **question:** "WARNING: This will permanently delete the track folder and all its contents. This action cannot be undone. Are you sure?"
-                - **type:** "yesno"
-        ii. **Handle Confirmation:**
-            - **If 'yes'**:
-                a. **Delete Track Folder:** Resolve the **Specs Directory** and permanently delete the track's folder from `<Specs Directory>/<track_id>`.
-                b. **Remove from Tracks File:** Read the content of the **Tracks Registry** file, remove the entire section for the completed track, and write the modified content back to the file.
-                c. **Commit Conductor Files:** Follow the **Git Write Policy** in the Conductor rule before staging and committing. Suggested message: `chore(conductor): Delete track '<track_description>'`.
-                d. **Announce Success:** Announce: "Track '<track_description>' has been permanently deleted."
-            - **If 'no'**:
-                a. **Announce Cancellation:** Announce: "Deletion cancelled. The track has not been changed."
-    *   **If user chooses "Skip":**
-        *   Announce: "Okay, the completed track will remain in your tracks file for now."
+4.  **Handle User Response:**
+
+    *   **Review:** Announce: "Run `/conductor-review` to verify changes. You can archive or continue afterward." Halt.
+
+    *   **Archive** (standalone): Execute archive steps (4a), commit, announce success. Halt.
+
+    *   **Delete** (standalone): Confirm via `AskQuestion` `yesno`, then delete steps (4b). Halt unless cancelled.
+
+    *   **Skip** (standalone): Announce completed track remains in tracks file. Halt.
+
+    *   **Skip and continue to `<track_id>`:** Announce leaving completed track in registry. Go to **§5.1 Continue** with that `<track_id>`.
+
+    *   **Archive and continue to `<track_id>`:** Execute archive steps (4a), commit, announce archived. Go to **§5.1 Continue** with that `<track_id>`.
+
+    *   **Choose next track…:** Call `AskQuestion` `choice` — one option per eligible track + **Stop for now**. On track pick → if user also wants archive first, call `AskQuestion` `yesno`: "Archive '<completed_track>' before continuing?" — on yes run 4a then §5.1; on no §5.1. On stop → halt.
+
+    **4a. Archive steps:**
+    i. Create `.cursor/archive/` if missing.
+    ii. Move `<Specs Directory>/<track_id>` → `.cursor/archive/<track_id>`.
+    iii. Remove completed track section from **Tracks Registry**.
+    iv. Follow **Git Write Policy** — message: `chore(conductor): Archive track '<track_description>'`.
+
+    **4b. Delete steps:** (after yes on confirm)
+    a. Delete `<Specs Directory>/<track_id>`.
+    b. Remove track section from **Tracks Registry**.
+    c. Follow **Git Write Policy** — message: `chore(conductor): Delete track '<track_description>'`.
+
+---
+
+## 5.1 CONTINUE TO NEXT TRACK
+**PROTOCOL: Jump to the next selected track after explicit user choice in §5.0.**
+
+1.  Resolve `<track_id>` against **Tracks Registry** and metadata. If no longer eligible (race), recompute per **Eligible Tracks Protocol** and call `AskQuestion` to pick again or halt.
+
+2.  Set `git_isolation_done = false`.
+
+3.  Go to **§3.0 TRACK IMPLEMENTATION** for the selected track.
+
+4.  **Loop:** After §3.0 → §4.0 → §5.0, user may again choose a combined continue option until no eligible tracks remain or they pick a standalone halt option.
 

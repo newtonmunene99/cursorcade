@@ -10,13 +10,14 @@ Run `/i-have-adhd` once per session for session-wide formatting on non-Conductor
 
 ### `/conductor-status`
 
-Line 1: **Next action** (command + track/task).
+Line 1: **Next action** (command + recommended track if eligible).
 
-Then (max 5 bullets):
+Then (max 6 bullets when programme tracks exist; otherwise 5):
 
-- **Track:** `[~]` track name — task N/M
+- **In progress:** `[~]` track — task N/M
 - **Progress:** completed/total (percent)
-- **Blockers:** only if any
+- **Eligible:** track ids ready to implement; mark `(∥)` when parallel-ready
+- **Blocked:** track waits on dependency — omit if none
 - **Verdict:** On track | Behind | Blocked
 
 ### `/conductor-implement`
@@ -27,7 +28,7 @@ Each progress update:
 2. **State:** task N/M, track name
 3. **Next:** the upcoming todo or command
 
-On track complete: lead with what shipped, then cleanup choice via `AskQuestion` only.
+On track complete: lead with what shipped, then §5.0 cleanup `AskQuestion` — include combined options (`Archive and continue to <track_id>`, `Skip and continue to <track_id>`) when eligible next tracks exist. User must choose; never auto-advance.
 
 ### `/conductor-review`
 

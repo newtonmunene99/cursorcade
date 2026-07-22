@@ -120,3 +120,11 @@ For each track:
 3. Decision track: scaffold OKF knowledge bundle + decisions index + log entries
 
 Suggested commit: `chore(conductor): Add remediation programme '<programme_id>'`
+
+## Implement and status
+
+After programme write:
+
+- **`/conductor-status`** — shows **Eligible**, **Parallel-ready** (∥), and **Blocked** tracks via **Eligible Tracks Protocol** (Conductor rule).
+- **`/conductor-implement`** — picks among eligible tracks when several are unblocked; after each track, §5.0 cleanup offers combined options (`Archive and continue to <track_id>`, etc.) — user must confirm before the next track starts.
+- Set matching `order` on parallel tracks (`∥` in sequencing table) so status and picker group them correctly.

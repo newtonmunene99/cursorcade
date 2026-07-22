@@ -61,6 +61,23 @@ To find a file (e.g., "**Product Definition**") within a specific context (Proje
 - `track_role` — `implementation` | `decision` | `docs`
 - `deliverable` — for decision tracks: OKF concept path within resolved bundle (e.g. `<pkg>/knowledge/decisions/<slug>.md` or `knowledge/decisions/<slug>.md`)
 
+## Eligible Tracks Protocol
+
+**PROTOCOL:** Used by `/conductor-implement` and `/conductor-status`.
+
+1. Parse **Tracks Registry** — for each track entry extract status (`[ ]`, `[~]`, `[x]`), description, and `<track_id>` from the spec link (`../specs/<track_id>/spec.md`).
+2. Read `.cursor/specs/<track_id>/metadata.json` for each incomplete track (`[ ]` or `[~]`). Default `depends_on: []`, `order: null`.
+3. **Eligible:** incomplete track where every id in `depends_on` is `[x]` in the registry.
+4. **Blocked:** incomplete track where any `depends_on` id is not `[x]`. Record first missing dependency for messaging.
+5. **Sort eligible** by `order` ascending (null/`order` missing → treat as `999`), then registry order.
+6. **Parallel-ready:** eligible tracks sharing the lowest `order` among eligible tracks (programme table `∥` rows should use the same `order` value).
+
+**Implement selection:** When no track argument is given and multiple tracks are eligible, use `AskQuestion` `choice` — do not pick by file order alone. When exactly one eligible track, confirm with `yesno`. When user names a blocked track, announce blockers and offer eligible picker.
+
+**Continue after complete:** Never auto-advance without user confirmation. In §5.0 cleanup `AskQuestion`, add **combined options** when eligible next tracks exist (e.g. `Archive and continue to <track_id>`, `Skip and continue to <track_id>`). On continue, reset per-track git isolation and loop to §3.0.
+
+**True parallelism:** Multiple parallel-ready tracks still run **one at a time** per agent session; use separate worktrees/chats for concurrent work.
+
 ## Knowledge Bundle Resolution
 
 **PROTOCOL:** When writing or reading OKF knowledge (project docs, domain docs, decision deliverables):

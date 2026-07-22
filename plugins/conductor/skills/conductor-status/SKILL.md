@@ -16,7 +16,9 @@ description: Display project and track progress
 
 Follow **Agent Output Style** in the Conductor rule — **i-have-adhd** skill for base rules; `templates/output-style.md` for status format.
 
-**Status-specific:** Line 1 = next action (`/conductor-implement <track>` or the pending todo). Then max 5 bullets: track + task N/M, progress fraction, blockers (if any), verdict (On track | Behind | Blocked).
+**Status-specific:** Line 1 = next action (`/conductor-implement` or named track). Then max 6 bullets: in-progress track + task N/M, progress fraction, **Eligible** tracks (mark ∥ when parallel-ready), **Blocked** tracks with missing `depends_on` (omit if none), verdict (On track | Behind | Blocked).
+
+Apply **Eligible Tracks Protocol** from the Conductor rule when any track has `depends_on` or `programme_id` in metadata.
 
 ## Plugin Template Path
 
@@ -77,12 +79,15 @@ CRITICAL: You must validate the success of every tool call. If any tool call fai
     -   The number of tasks completed, in progress, and pending.
 
 ### 2.3 Present Status Overview
-1.  **Output Summary:** Follow **Output Style** above. Required fields (cap at 5 bullets total):
-    -   **Next action:** Command or todo to run now
-    -   **Track / task:** `[~]` track name — task N/M (or "none in progress")
-    -   **Progress:** tasks_completed/tasks_total (percentage)
-    -   **Blockers:** Only if explicitly marked in the plan; omit if none
+1.  **Compute dependency state:** For programme tracks, apply **Eligible Tracks Protocol** in the Conductor rule. Identify **eligible**, **parallel-ready** (lowest shared `order`), and **blocked** tracks.
+2.  **Output Summary:** Follow **Output Style** above. Required fields:
+    -   **Next action:** `/conductor-implement` when eligible tracks exist; name the recommended track (lowest `order`). If none eligible, say which blocker to clear first.
+    -   **In progress:** `[~]` track — task N/M (or "none")
+    -   **Progress:** tasks_completed/tasks_total across active programme or all tracks (percentage)
+    -   **Eligible:** comma-separated track ids/descriptions; append `(∥)` when multiple parallel-ready
+    -   **Blocked:** `<track>` waits on `<depends_on>` — omit section if none
     -   **Verdict:** On track | Behind | Blocked (one word + optional reason)
     -   Include current timestamp on its own line after the next-action line
+3.  **Programme table:** When `tracks.md` has a sequencing table, one line: "See sequencing table in tracks.md for order."
 
 

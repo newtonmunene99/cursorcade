@@ -10,8 +10,8 @@ Context-driven development for Cursor: setup, spec, plan, implement, review, and
 | :------ | :---------- |
 | `/conductor-setup` | One-time project bootstrap |
 | `/conductor-new-track` | Brainstorm, spec, plan (single track or **programme mode**) |
-| `/conductor-implement` | Execute plan todos (respects `depends_on`) |
-| `/conductor-status` | Show progress |
+| `/conductor-implement` | Execute plan todos (`depends_on`, eligible picker, cleanup + continue options) |
+| `/conductor-status` | Progress + eligible / parallel-ready / blocked tracks |
 | `/conductor-revert` | Git-aware revert |
 | `/conductor-review` | Review against guidelines, plan, spec |
 | `/conductor-programme-review` | Review multi-track programme |
@@ -20,7 +20,7 @@ Context-driven development for Cursor: setup, spec, plan, implement, review, and
 
 ## Programme mode
 
-From `.cursor/reviews/*.md` → validate → split tracks → synthesis → implement in order.
+From `.cursor/reviews/*.md` → validate → split tracks → synthesis → implement in order (continue via explicit cleanup choices when unblocked).
 
 Reference: `docs/examples/remediation-programme-example.md`
 
