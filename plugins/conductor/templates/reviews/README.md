@@ -47,7 +47,7 @@ programme_id: scope_remediation_YYYYMMDD
 2. **Validate** — `/conductor-validate-review` produces `*_validation.md` sibling
 3. **Programme** — `/conductor-new-track` from review → N tracks + sequencing table
 4. **Implement** — `/conductor-implement` respecting `depends_on`
-5. **Archive** — completed tracks may link review from `.cursor/archive/<track_id>/index.md`
+5. **Archive** — completed tracks may link review from `conductor/archive/<track_id>/index.md`
 
 ## Validation addendum
 

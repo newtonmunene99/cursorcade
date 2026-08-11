@@ -7,6 +7,6 @@ description: Validate a code review document against the repository before creat
 
 Validate a code review document against the repository before creating a remediation programme.
 
-Usage: `/conductor-validate-review` or `/conductor-validate-review .cursor/reviews/foo_YYYYMMDD-review.md`
+Usage: `/conductor-validate-review` or `/conductor-validate-review conductor/reviews/foo_YYYYMMDD-review.md`
 
 Follow the skill at `skills/conductor-validate-review/SKILL.md`.

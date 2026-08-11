@@ -9,9 +9,9 @@ Follow [OKF v0.1](https://github.com/GoogleCloudPlatform/knowledge-catalog/blob/
 1. **Existing bundle** — scan repo for `**/knowledge/index.md` (with or without `okf_version` in frontmatter). Use the bundle whose scope matches the work.
 2. **Domain/package bundle** — when track, review, or user scope names a module (e.g. `<pkg>/`, `internal/auth/`), use `<pkg>/knowledge/`.
 3. **Repo-root bundle** — when knowledge spans the whole project, use `knowledge/` at repository root.
-4. **Fallback** — `.cursor/knowledge/` only when no code domain applies (rare: user declines repo-root placement).
+4. **Fallback** — `conductor/knowledge/` only when no code domain applies (rare: user declines repo-root placement).
 
-**Do not** default new project knowledge to `.cursor/knowledge/` when the user asked for repo or domain documentation.
+**Do not** default new project knowledge to `conductor/knowledge/` when the user asked for repo or domain documentation.
 
 ## Discovery (read-only)
 
@@ -39,7 +39,7 @@ Concept ID = path within bundle without `.md` (e.g. `decisions/<slug>`).
 
 ## Link from Conductor context
 
-In `.cursor/context/index.md`, link to repo knowledge bundles:
+In `conductor/context/index.md`, link to repo knowledge bundles:
 
 ```markdown
 ## Knowledge (OKF)

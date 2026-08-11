@@ -9,9 +9,9 @@ Anonymized case study for Conductor programme mode: ~25 review findings → five
 | Domain knowledge | `<pkg>/knowledge/` (packages, concepts, operations) |
 | Decision deliverable (Track E) | `<pkg>/knowledge/decisions/<slug>.md` |
 | Spike evidence | `<pkg>/knowledge/decisions/evidence/<slug>.md` |
-| Conductor planning | `.cursor/specs/`, `.cursor/plans/`, `.cursor/reviews/` |
+| Conductor planning | `conductor/specs/`, `conductor/plans/`, `conductor/reviews/` |
 
-Decision tracks **extend the domain bundle** beside code — not `.cursor/knowledge/`.
+Decision tracks **extend the domain bundle** beside code — not `conductor/knowledge/`.
 
 ## Programme tracks (illustrative)
 
@@ -34,7 +34,7 @@ See [OKF v0.1](https://github.com/GoogleCloudPlatform/knowledge-catalog/blob/mai
 ## Workflow
 
 ```text
-/conductor-validate-review .cursor/reviews/<scope>_YYYYMMDD-review.md
+/conductor-validate-review conductor/reviews/<scope>_YYYYMMDD-review.md
 /conductor-new-track remediation from <review>   # resolves bundle: <pkg>/knowledge/
 /conductor-programme-review <programme_id>
 /conductor-implement

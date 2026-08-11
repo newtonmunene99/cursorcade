@@ -14,7 +14,7 @@ markdown files with YAML frontmatter; cross-links use bundle-relative paths
 (starting with `/`).
 
 Place this file at **`knowledge/index.md`** (repo root) or **`<module>/knowledge/index.md`**
-(domain scope) — not under `.cursor/` unless no code domain exists.
+(domain scope) — not under `conductor/` unless no code domain exists.
 
 [okf-spec]: https://github.com/GoogleCloudPlatform/knowledge-catalog/blob/main/okf/SPEC.md
 

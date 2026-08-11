@@ -10,7 +10,7 @@ description: Execute tasks from a track's Cursor plan
 - **AskQuestion** for structured user prompts (replaces Gemini `ask_user`)
 - **Write** / **StrReplace** for file operations (replaces `write_file` / `replace`)
 - **Shell** for shell commands (replaces `run_shell_command`)
-- Use relative paths under `.cursor/` for all Conductor artifacts
+- Use relative paths under `conductor/` for all Conductor artifacts
 
 ## Output Style
 
@@ -27,7 +27,7 @@ Locate installed plugin templates in this order:
 
 ## Cursor Plan Format
 
-When creating or updating implementation plans, write to `.cursor/plans/<slug>_<shortid>.plan.md` with this frontmatter:
+When creating or updating implementation plans, write to `conductor/plans/<slug>_<shortid>.plan.md` with this frontmatter:
 
 ```yaml
 ---
@@ -44,11 +44,11 @@ isProject: true
 - `status` values: `pending`, `in_progress`, `completed`
 - On task completion, set `status: completed` and append commit SHA to `content`
 - Markdown body below frontmatter carries phases, goals, architecture
-- Register plan path in `.cursor/context/tracks.md`
+- Register plan path in `conductor/context/tracks.md`
 
 ## Tracks Registry Format
 
-Use this format in `.cursor/context/tracks.md`:
+Use this format in `conductor/context/tracks.md`:
 
 ```markdown
 - [ ] **Track: Description**
@@ -63,7 +63,7 @@ Status markers: `[ ]` pending, `[~]` in progress, `[x]` complete.
 When executing tasks, update the plan file frontmatter:
 1. Set `todos[].status` to `in_progress` before starting a task
 2. Set `todos[].status` to `completed` and append ` (<sha>)` to `content` after commit
-3. Follow `.cursor/context/workflow.md` for TDD, git notes, and phase checkpoints
+3. Follow `conductor/context/workflow.md` for TDD, git notes, and phase checkpoints
 
 
 ## 1.0 SYSTEM DIRECTIVE
@@ -143,7 +143,7 @@ CRITICAL: You must validate the success of every tool call. If any tool call fai
 
 3.  **Legacy Sync Fallback (only when the plan has no `conductor-sync-in-progress` todo):**
     -   Update **Tracks Registry** `- [ ]` → `- [~]`.
-    -   Update `.cursor/specs/<track_id>/metadata.json`: `status: in_progress`, refresh `updated_at`.
+    -   Update `conductor/specs/<track_id>/metadata.json`: `status: in_progress`, refresh `updated_at`.
     -   If the plan already includes `conductor-sync-in-progress`, **skip this step** — the task loop owns sync.
     -   After this step, run **Git Isolation** per §3.0 step 4d before the task loop continues.
 
@@ -246,7 +246,7 @@ CRITICAL: You must validate the success of every tool call. If any tool call fai
 
     **Always include:**
     - **Review** — Run `/conductor-review` before finalizing.
-    - **Archive** — Move track folder to `.cursor/archive/`, remove from tracks file.
+    - **Archive** — Move track folder to `conductor/archive/`, remove from tracks file.
     - **Delete** — Permanently delete track folder and registry entry.
     - **Skip** — Leave completed track in tracks file; stop for now.
 
@@ -282,8 +282,8 @@ CRITICAL: You must validate the success of every tool call. If any tool call fai
     *   **Choose next track…:** Call `AskQuestion` `choice` — one option per eligible track + **Stop for now**. On track pick → if user also wants archive first, call `AskQuestion` `yesno`: "Archive '<completed_track>' before continuing?" — on yes run 4a then §5.1; on no §5.1. On stop → halt.
 
     **4a. Archive steps:**
-    i. Create `.cursor/archive/` if missing.
-    ii. Move `<Specs Directory>/<track_id>` → `.cursor/archive/<track_id>`.
+    i. Create `conductor/archive/` if missing.
+    ii. Move `<Specs Directory>/<track_id>` → `conductor/archive/<track_id>`.
     iii. Remove completed track section from **Tracks Registry**.
     iv. Follow **Git Write Policy** — message: `chore(conductor): Archive track '<track_description>'`.
 

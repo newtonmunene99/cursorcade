@@ -29,7 +29,7 @@ Correcting false claims in **domain OKF bundles** (e.g. `<pkg>/knowledge/package
 ## Acceptance criteria
 
 - [ ] OKF decision concept at `<bundle-root>/decisions/<slug>.md` with required `type`
-- [ ] Bundle root is repo-scoped (`knowledge/` or `<pkg>/knowledge/`), not `.cursor/knowledge/` unless placement guide fallback applies
+- [ ] Bundle root is repo-scoped (`knowledge/` or `<pkg>/knowledge/`), not `conductor/knowledge/` unless placement guide fallback applies
 - [ ] Spike branch deleted; backlog references concept ID `decisions/<slug>`
 
 ## Engineering skill hooks

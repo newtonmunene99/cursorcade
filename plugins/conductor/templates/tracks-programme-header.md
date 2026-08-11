@@ -1,6 +1,6 @@
 # Tracks Programme Header Template
 
-Insert once per programme in `.cursor/context/tracks.md` before track entries.
+Insert once per programme in `conductor/context/tracks.md` before track entries.
 
 ```markdown
 ---

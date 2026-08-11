@@ -10,7 +10,7 @@ description: Scaffold project and set up the Conductor environment
 - **AskQuestion** for structured user prompts (replaces Gemini `ask_user`)
 - **Write** / **StrReplace** for file operations (replaces `write_file` / `replace`)
 - **Shell** for shell commands (replaces `run_shell_command`)
-- Use relative paths under `.cursor/` for all Conductor artifacts
+- Use relative paths under `conductor/` for all Conductor artifacts
 
 ## Output Style
 
@@ -27,7 +27,7 @@ Locate installed plugin templates in this order:
 
 ## Cursor Plan Format
 
-When creating or updating implementation plans, write to `.cursor/plans/<slug>_<shortid>.plan.md` with this frontmatter:
+When creating or updating implementation plans, write to `conductor/plans/<slug>_<shortid>.plan.md` with this frontmatter:
 
 ```yaml
 ---
@@ -44,11 +44,11 @@ isProject: true
 - `status` values: `pending`, `in_progress`, `completed`
 - On task completion, set `status: completed` and append commit SHA to `content`
 - Markdown body below frontmatter carries phases, goals, architecture
-- Register plan path in `.cursor/context/tracks.md`
+- Register plan path in `conductor/context/tracks.md`
 
 ## Tracks Registry Format
 
-Use this format in `.cursor/context/tracks.md`:
+Use this format in `conductor/context/tracks.md`:
 
 ```markdown
 - [ ] **Track: Description**
@@ -81,20 +81,35 @@ CRITICAL: You must validate the success of every tool call. If a tool call fails
 
 2.  **Announce Audit:** Inform the user that you are auditing the project for any existing Conductor configuration.
 
-3.  **Audit Artifacts:** Check the file system for the existence of the following files/directories in the `.cursor/context/` directory:
+3.  **Audit Artifacts (deterministic):** From the project root, run the resume script with the Shell tool. Resolve the script in this order:
+    1. `~/.cursor/plugins/local/conductor/skills/conductor-setup/scripts/resume.py`
+    2. Search `~/.cursor/plugins/cache/` for `conductor-setup/scripts/resume.py`
+    3. Fallback (marketplace dev): `./plugins/conductor/skills/conductor-setup/scripts/resume.py`
+
+    ```sh
+    python3 <resolved-resume.py>
+    ```
+
+    It prints JSON — `checklist`, `initialized`, `setup_complete`, `target_section`, `next_step` — computed from the priority table below.
+
+    **Fallback (only if `python3` is unavailable or the script fails):** check manually for these files/directories in `conductor/context/`:
     - `product.md`
     - `product-guidelines.md`
     - `tech-stack.md`
     - `code_styleguides/`
     - `workflow.md`
     - `index.md`
-    - `tracks/*/` (specifically Cursor plan file and `index.md`)
+    - `tracks.md`
 
-4.  **Determine Target Section:** Map the project's state to a target section using the priority table below (highest match wins). **DO NOT JUMP YET.** Keep this target in mind.
+    Also check outside `context/`:
+    - `conductor/specs/<track_id>/` (contains `spec.md`, `metadata.json`, `index.md`)
+    - `conductor/plans/*.plan.md`
+
+4.  **Determine Target Section:** Use `target_section` from the script output; on manual fallback, map the project's state through the priority table below (highest match wins). **DO NOT JUMP YET.** Keep this target in mind.
 
 | Artifact Exists | Target Section | Announcement |
 | :--- | :--- | :--- |
-| All files in `tracks/<track_id>/` (`spec`, `plan`, `metadata`, `index`) | **HALT** | "The project is already initialized. Use `/conductor-new-track` or `/conductor-implement`." |
+| `tracks.md` exists, or any `conductor/specs/<track_id>/` contains `spec.md` | **HALT** | "The project is already initialized. Use `/conductor-new-track` or `/conductor-implement`." |
 | `index.md` (top-level) | **Section 3.0** | "Resuming setup: Scaffolding is complete. Next: generate the first track. (Note: If an incomplete track folder was detected, we will restart this step to ensure a clean, consistent state)." |
 | `workflow.md` | **Section 2.6** | "Resuming setup: Workflow is defined. Next: select Agent Skills." |
 | `code_styleguides/` | **Section 2.5** | "Resuming setup: Guides/Tech Stack configured. Next: define project workflow." |
@@ -117,12 +132,12 @@ CRITICAL: You must validate the success of every tool call. If a tool call fails
     -   **Brownfield Indicators:**
         -   Check for dependency manifests: `package.json`, `pom.xml`, `requirements.txt`, `go.mod`, `Cargo.toml`.
         -   Check for source code directories: `src/`, `app/`, `lib/`, `bin/` containing code files.
-        -   If a `.git` directory exists, execute `git status --porcelain`. Ignore changes within the `.cursor/context/` directory. If there are *other* uncommitted changes, it may be Brownfield.
+        -   If a `.git` directory exists, execute `git status --porcelain`. Ignore changes within the `conductor/context/` directory. If there are *other* uncommitted changes, it may be Brownfield.
         -   If ANY of the primary indicators (manifests or source code directories) are found, classify as **Brownfield**.
     -   **Greenfield Condition:**
         -   Classify as **Greenfield** ONLY if:
             1. NONE of the "Brownfield Indicators" are found.
-            2. The directory contains no application source code or dependency manifests (ignoring the `.cursor/context/` directory, a clean or newly initialized `.git` folder, and a `README.md`).
+            2. The directory contains no application source code or dependency manifests (ignoring the `conductor/context/` directory, a clean or newly initialized `.git` folder, and a `README.md`).
 
 
 2.  **Resume Fast-Forward Check:**
@@ -182,7 +197,7 @@ CRITICAL: You must validate the success of every tool call. If a tool call fails
     -   **CRITICAL: You MUST NOT execute any tool calls until the user has provided a response.**
     -   **Upon receiving the user's response:**
         -   Execute `mkdir -p conductor`.
-        -   Write the user's response into `.cursor/context/product.md` under a header named `# Initial Concept`.
+        -   Write the user's response into `conductor/context/product.md` under a header named `# Initial Concept`.
 
 6.  **Continue:** Immediately proceed to the next section.
 
@@ -230,7 +245,7 @@ CRITICAL: You must validate the success of every tool call. If a tool call fails
             - **options:**
                 - Label: "Approve", Description: "The guide looks good, proceed to the next step."
                 - Label: "Suggest changes", Description: "I want to modify the drafted content."
-6.  **Write File:** Once approved, append the generated content to the existing `.cursor/context/product.md` file, preserving the `# Initial Concept` section.
+6.  **Write File:** Once approved, append the generated content to the existing `conductor/context/product.md` file, preserving the `# Initial Concept` section.
 7.  **Continue:** Immediately proceed to the next section.
 
 ### 2.2 Generate Product Guidelines (Interactive)
@@ -277,7 +292,7 @@ CRITICAL: You must validate the success of every tool call. If a tool call fails
             - **options:**
                 - Label: "Approve", Description: "The guidelines look good, proceed to the next step."
                 - Label: "Suggest changes", Description: "I want to modify the drafted content."
-6.  **Write File:** Once approved, write the generated content to the `.cursor/context/product-guidelines.md` file.
+6.  **Write File:** Once approved, write the generated content to the `conductor/context/product-guidelines.md` file.
 7.  **Continue:** Immediately proceed to the next section.
 
 ### 2.3 Generate Tech Stack (Interactive)
@@ -332,7 +347,7 @@ CRITICAL: You must validate the success of every tool call. If a tool call fails
             - **options:**
                 - Label: "Approve", Description: "The tech stack looks good, proceed to the next step."
                 - Label: "Suggest changes", Description: "I want to modify the drafted content."
-6.  **Write File:** Once approved, write the generated content to the `.cursor/context/tech-stack.md` file.
+6.  **Write File:** Once approved, write the generated content to the `conductor/context/tech-stack.md` file.
 7.  **Continue:** Immediately proceed to the next section.
 
 ### 2.4 Select Guides (Interactive)
@@ -375,12 +390,12 @@ CRITICAL: You must validate the success of every tool call. If a tool call fails
             -   **Action:** Announce "I'll present the additional guides. Please select all that apply." Then, immediately call the `AskQuestion` tool (do not list the questions in the chat).
             -   **Method:** Use a single `AskQuestion` tool call. Dynamically split the available guides into batches of 4 options max. Create one `multiSelect: true` question for each batch.
 
-3.  **Action:** Construct and execute a command to create the directory and copy all selected files. For example: `mkdir -p .cursor/context/code_styleguides && cp PLUGIN_TEMPLATES/code_styleguides/python.md PLUGIN_TEMPLATES/code_styleguides/javascript.md .cursor/context/code_styleguides/`
+3.  **Action:** Construct and execute a command to create the directory and copy all selected files. For example: `mkdir -p conductor/context/code_styleguides && cp PLUGIN_TEMPLATES/code_styleguides/python.md PLUGIN_TEMPLATES/code_styleguides/javascript.md conductor/context/code_styleguides/`
 4.  **Continue:** Immediately proceed to the next section.
 
 ### 2.5 Select Workflow (Interactive)
 1.  **Copy Initial Workflow:**
-    -   Copy `PLUGIN_TEMPLATES/workflow.md` to `.cursor/context/workflow.md`.
+    -   Copy `PLUGIN_TEMPLATES/workflow.md` to `conductor/context/workflow.md`.
 2.  **Determine Mode:** Use the `AskQuestion` tool to let the user choose their preferred workflow.
     - **questions:**
         - **header:** "Workflow"
@@ -421,12 +436,12 @@ CRITICAL: You must validate the success of every tool call. If a tool call fails
 
                     Is there anything else you'd like to change or add to the workflow? (Leave blank to finish or type your additional requirements).
 
-4.  **Action:** Update `.cursor/context/workflow.md` based on all user answers from both steps.
+4.  **Action:** Update `conductor/context/workflow.md` based on all user answers from both steps.
 
 
 ### 2.7 Finalization
 1.  **Generate Index File:**
-    -   Create `.cursor/context/index.md` with the following content:
+    -   Create `conductor/context/index.md` with the following content:
         ```markdown
         # Project Context
 
@@ -446,9 +461,9 @@ CRITICAL: You must validate the success of every tool call. If a tool call fails
         - [Knowledge](../knowledge/) — link to repo OKF bundle when present; add domain bundle links as discovered (e.g. `../../<pkg>/knowledge/`)
         - [Specs Directory](../specs/)
         ```
-    -   **Create Reviews directory:** Copy `templates/reviews/README.md` to `.cursor/reviews/README.md` (create directory if missing).
-    -   **Announce:** "Created `.cursor/context/index.md` and `.cursor/reviews/`."
-    -   **Knowledge:** Do not scaffold `.cursor/knowledge/` by default. On setup, discover repo `knowledge/` or `<module>/knowledge/` bundles and link from `index.md`. Offer to scaffold repo-root `knowledge/` via `AskQuestion` when user asks for project docs.
+    -   **Create Reviews directory:** Copy `templates/reviews/README.md` to `conductor/reviews/README.md` (create directory if missing).
+    -   **Announce:** "Created `conductor/context/index.md` and `conductor/reviews/`."
+    -   **Knowledge:** Do not scaffold `conductor/knowledge/` by default. On setup, discover repo `knowledge/` or `<module>/knowledge/` bundles and link from `index.md`. Offer to scaffold repo-root `knowledge/` via `AskQuestion` when user asks for project docs.
 
 2.  **Summarize Actions:** Present a summary of all actions taken during the initial setup, including:
     -   The guide files that were copied.
@@ -460,11 +475,11 @@ CRITICAL: You must validate the success of every tool call. If a tool call fails
 ## 3.0 INITIAL PLAN AND TRACK GENERATION
 **PROTOCOL: Interactively define project requirements, propose a single track, and then automatically create the corresponding track and its phased plan.**
 
-**Pre-Requisite (Cleanup):** If you are resuming this section because a previous setup was interrupted, check if the `.cursor/specs/` directory exists but is incomplete. If it exists, **delete** the entire `.cursor/specs/` directory before proceeding to ensure a clean slate for the new track generation.
+**Pre-Requisite (Cleanup):** If you are resuming this section because a previous setup was interrupted, check if the `conductor/specs/` directory exists but is incomplete. If it exists, **delete** the entire `conductor/specs/` directory before proceeding to ensure a clean slate for the new track generation.
 
 ### 3.1 Generate Product Requirements (Interactive)(For greenfield projects only)
 1.  **Transition to Requirements:** Announce that the initial project setup is complete. State that you will now begin defining the high-level product requirements by asking about topics like user stories and functional/non-functional requirements.
-2.  **Analyze Context:** Read and analyze the content of `.cursor/context/product.md` to understand the project's core concept.
+2.  **Analyze Context:** Read and analyze the content of `conductor/context/product.md` to understand the project's core concept.
 3.  **Determine Mode:** Use the `AskQuestion` tool to let the user choose their preferred workflow.
     - **questions:**
         - **header:** "Product Reqs"
@@ -533,7 +548,7 @@ CRITICAL: You must validate the success of every tool call. If a tool call fails
 **Note:** Setup auto-generates the initial track spec and plan without the §2.2 brainstorm HARD-GATE from `/conductor-new-track`. That is intentional for bootstrap — use `/conductor-new-track` for subsequent tracks with full brainstorm → spec → plan flow.
 
 1.  **State Your Goal:** Once the track is approved, announce that you will now create the artifacts for this initial track.
-2.  **Initialize Tracks File:** Create the `.cursor/context/tracks.md` file with the initial header and the first track:
+2.  **Initialize Tracks File:** Create the `conductor/context/tracks.md` file with the initial header and the first track:
     ```markdown
     # Project Tracks
 
@@ -548,18 +563,18 @@ CRITICAL: You must validate the success of every tool call. If a tool call fails
 3.  **Generate Track Artifacts:**
     a. **Define Track:** The approved title is the track description.
     b. **Generate Track-Specific Spec & Plan:**
-        i. Automatically generate a detailed `spec.md` in `.cursor/specs/<track_id>/`.
-        ii. Automatically generate a Cursor plan file at `.cursor/plans/<slug>_<shortid>.plan.md` with frontmatter `todos` (see Cursor Plan Format above).
+        i. Automatically generate a detailed `spec.md` in `conductor/specs/<track_id>/`.
+        ii. Automatically generate a Cursor plan file at `conductor/plans/<slug>_<shortid>.plan.md` with frontmatter `todos` (see Cursor Plan Format above).
             - **Load Plan Authoring Guide:** Resolve and read `templates/plan-authoring-guide.md` from the **Plugin Template Path**. Follow it for plan quality, mandatory sync todos, and plan body structure.
             - **CRITICAL:** Each todo must have `id`, `content`, and `status: pending`.
-            - **CRITICAL:** The plan structure MUST adhere to `.cursor/context/workflow.md` (e.g., TDD: separate todos for "Write Tests" and "Implement").
+            - **CRITICAL:** The plan structure MUST adhere to `conductor/context/workflow.md` (e.g., TDD: separate todos for "Write Tests" and "Implement").
             - **CRITICAL: Mandatory sync bookends.** First todo MUST be `conductor-sync-in-progress`; last todo MUST be `conductor-sync-complete`. Do NOT inject git-isolation todos unless the user explicitly requested one.
             - **CRITICAL: Inject Phase Completion Tasks.** If workflow defines "Phase Completion Verification and Checkpointing Protocol", add a todo per phase: `content: "Conductor - User Manual Verification '<Phase Name>' (Protocol in workflow.md)"`.
             - **CRITICAL: Plan self-review** per the Plan Authoring Guide before writing the file.
             - **CRITICAL: Path verification** per the Plan Authoring Guide Path verification checklist before writing the file. Halt on unresolved paths.
     c. **Create Track Artifacts:**
         i. **Generate and Store Track ID:** Create a unique Track ID from the track description using format `shortname_YYYYMMDD` and store it. You MUST use this exact same ID for all subsequent steps for this track.
-        ii. **Create Single Directory:** Resolve the **Specs Directory** via the **Universal File Resolution Protocol** and create a single new directory: `.cursor/specs/<track_id>/`.
+        ii. **Create Single Directory:** Resolve the **Specs Directory** via the **Universal File Resolution Protocol** and create a single new directory: `conductor/specs/<track_id>/`.
         iii. **Create `metadata.json`:** In the new directory, create a `metadata.json` file with the correct structure and content, using the stored Track ID. An example is:
             - ```json
             {
@@ -572,7 +587,7 @@ CRITICAL: You must validate the success of every tool call. If a tool call fails
             }
             ```
         Populate fields with actual values. Use the current timestamp.
-        iv. **Write Spec** to `.cursor/specs/<track_id>/spec.md` and **Plan** to `.cursor/plans/<slug>_<shortid>.plan.md`.
+        iv. **Write Spec** to `conductor/specs/<track_id>/spec.md` and **Plan** to `conductor/plans/<slug>_<shortid>.plan.md`.
         v.  **Write Index File:** In the exact same directory, write `index.md` with content:
             ```markdown
             # Track <track_id> Context

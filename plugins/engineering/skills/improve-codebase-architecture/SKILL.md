@@ -51,7 +51,7 @@ For each candidate, render a card with:
 
 End the report with a **Top recommendation** section: which candidate you'd tackle first and why.
 
-**Use CONTEXT.md vocabulary for the domain, and the `/codebase-design` vocabulary for the architecture.** If `.cursor/context/product.md` (or repo-root `CONTEXT.md` if present) defines "Order," talk about "the Order intake module" — not "the FooBarHandler," and not "the Order service."
+**Use CONTEXT.md vocabulary for the domain, and the `/codebase-design` vocabulary for the architecture.** If `conductor/context/product.md` (or repo-root `CONTEXT.md` if present) defines "Order," talk about "the Order intake module" — not "the FooBarHandler," and not "the Order service."
 
 **OKF decision conflicts**: if a candidate contradicts an existing OKF decision concept, only surface it when the friction is real enough to warrant revisiting. Mark it in the card (e.g. _"contradicts [<title>](/<pkg>/knowledge/decisions/<slug>.md) — worth reopening because…"_).
 
@@ -65,7 +65,7 @@ Once the user picks a candidate, run the `/grilling` skill to walk the decision 
 
 Side effects happen inline as decisions crystallize — run the `/domain-modeling` skill to keep the domain model current as you go:
 
-- **Naming a deepened module after a concept not in `.cursor/context/product.md` (or repo-root `CONTEXT.md` if present)?** Add the term to `.cursor/context/product.md` (or repo-root `CONTEXT.md` if present). Create the file lazily if it doesn't exist.
-- **Sharpening a fuzzy term during the conversation?** Update `.cursor/context/product.md` (or repo-root `CONTEXT.md` if present) right there.
+- **Naming a deepened module after a concept not in `conductor/context/product.md` (or repo-root `CONTEXT.md` if present)?** Add the term to `conductor/context/product.md` (or repo-root `CONTEXT.md` if present). Create the file lazily if it doesn't exist.
+- **Sharpening a fuzzy term during the conversation?** Update `conductor/context/product.md` (or repo-root `CONTEXT.md` if present) right there.
 - **User rejects the candidate with a load-bearing reason?** Offer an OKF decision concept via `/grill-with-docs`, framed as: _"Want me to record this as a knowledge decision so future architecture reviews don't re-suggest it?"_
 - **Want to explore alternative interfaces for the deepened module?** Resolve the engineering plugin `codebase-design` skill and use its design-it-twice parallel sub-agent pattern.

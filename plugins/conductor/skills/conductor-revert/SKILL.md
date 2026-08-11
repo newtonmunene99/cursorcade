@@ -10,7 +10,7 @@ description: Git-aware revert of track, phase, or task
 - **AskQuestion** for structured user prompts (replaces Gemini `ask_user`)
 - **Write** / **StrReplace** for file operations (replaces `write_file` / `replace`)
 - **Shell** for shell commands (replaces `run_shell_command`)
-- Use relative paths under `.cursor/` for all Conductor artifacts
+- Use relative paths under `conductor/` for all Conductor artifacts
 
 ## Output Style
 

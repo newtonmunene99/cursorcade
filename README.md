@@ -30,6 +30,19 @@ Then install the plugins you want from the marketplace panel.
 
 See each plugin's README for commands, usage, and uninstall instructions.
 
+## Conductor project artifacts
+
+Conductor stores project state under `conductor/` at the repo root (shared layout with [gemini-cli-extensions/conductor](https://github.com/gemini-cli-extensions/conductor) and [claudekit](https://github.com/newtonmunene99/claudekit)):
+
+```text
+conductor/
+├── context/          # product, workflow, tracks registry
+├── specs/<track_id>/ # track specifications
+├── plans/            # implementation plans
+├── reviews/          # programme reviews
+└── archive/          # completed tracks
+```
+
 ## Local development
 
 Symlink a plugin for local testing:

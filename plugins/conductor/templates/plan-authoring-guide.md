@@ -1,6 +1,6 @@
 # Conductor Plan Authoring Guide
 
-Use this guide when generating Cursor plan files (`.cursor/plans/*.plan.md`) during `/conductor-new-track`, `/conductor-setup`, or when revising an existing track plan.
+Use this guide when generating Cursor plan files (`conductor/plans/*.plan.md`) during `/conductor-new-track`, `/conductor-setup`, or when revising an existing track plan.
 
 Techniques adapted from [Superpowers](https://github.com/obra/superpowers) (MIT).
 
@@ -10,7 +10,7 @@ Every plan body MUST start with:
 
 ```markdown
 > **Conductor plan:** Runnable directly in Cursor or via `/conductor-implement`.
-> Follow `.cursor/context/workflow.md`, the Git Write Policy, and Agent Output Style in the Conductor rule.
+> Follow `conductor/context/workflow.md`, the Git Write Policy, and Agent Output Style in the Conductor rule.
 ```
 
 Below the header, include:
@@ -169,7 +169,7 @@ These are plan failures — never write them:
 
 **Run after plan draft, before user confirmation.** Block plan approval on unresolved paths.
 
-1. **Extract paths** from every `**Files:**` line and inline backticks that look like repo paths. Exclude `.cursor/` Conductor artifacts.
+1. **Extract paths** from every `**Files:**` line and inline backticks that look like repo paths. Exclude `conductor/` Conductor artifacts.
 2. **Verify each path** using read-only shell:
    - `test -f <path>` or `test -d <path>`
    - Glob for `*_test.go` / naming variants when exact path missing
@@ -205,4 +205,4 @@ After drafting the complete plan, run this checklist and fix inline:
 
 ## Direct plan execution
 
-Users may run this plan from Cursor chat without `/conductor-implement`. Sync bookend todos keep `tracks.md` and `metadata.json` aligned with progress. Implementation todos follow `.cursor/context/workflow.md` including TDD and Systematic Debugging Protocol.
+Users may run this plan from Cursor chat without `/conductor-implement`. Sync bookend todos keep `tracks.md` and `metadata.json` aligned with progress. Implementation todos follow `conductor/context/workflow.md` including TDD and Systematic Debugging Protocol.

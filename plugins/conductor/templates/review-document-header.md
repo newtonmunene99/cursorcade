@@ -1,6 +1,6 @@
 # Review Document Header Template
 
-Optional YAML frontmatter + markdown header for `.cursor/reviews/<slug>_YYYYMMDD-review.md`.
+Optional YAML frontmatter + markdown header for `conductor/reviews/<slug>_YYYYMMDD-review.md`.
 
 ```yaml
 ---

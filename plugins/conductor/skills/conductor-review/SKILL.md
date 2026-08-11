@@ -10,7 +10,7 @@ description: Review completed work against guidelines, plan, spec, and documenta
 - **AskQuestion** for structured user prompts (replaces Gemini `ask_user`)
 - **Write** / **StrReplace** for file operations (replaces `write_file` / `replace`)
 - **Shell** for shell commands (replaces `run_shell_command`)
-- Use relative paths under `.cursor/` for all Conductor artifacts
+- Use relative paths under `conductor/` for all Conductor artifacts
 
 ## Output Style
 
@@ -138,8 +138,8 @@ Use `/conductor-programme-review` as alias entry point (same protocol).
 
 After listing changed files (`git diff --name-only <revision_range>`):
 
-1.  **Always read:** `.cursor/context/product-guidelines.md`, `.cursor/context/tech-stack.md`.
-2.  **Conductor style guides:** If `.cursor/context/code_styleguides/` exists, read only guides relevant to **changed file extensions/languages**. These are **Law** for those paths — quote the exact rule when flagging violations (**High** severity).
+1.  **Always read:** `conductor/context/product-guidelines.md`, `conductor/context/tech-stack.md`.
+2.  **Conductor style guides:** If `conductor/context/code_styleguides/` exists, read only guides relevant to **changed file extensions/languages**. These are **Law** for those paths — quote the exact rule when flagging violations (**High** severity).
 3.  **Repo guidelines (changed paths only):** For each directory containing changed files, check for applicable:
     - Root: `AGENTS.md`, `CLAUDE.md`, `CONTRIBUTING.md`, `.cursor/rules/`
     - Nested: parent-directory `AGENTS.md`, `CLAUDE.md`, `.cursor/rules/`
@@ -393,14 +393,14 @@ Document errors, panics, and edge cases when the signature alone is insufficient
         - **type:** "choice"
         - **multiSelect:** false
         - **options:**
-            - Label: "Archive", Description: "Move the track's folder to `.cursor/archive/` and remove it from the tracks file."
+            - Label: "Archive", Description: "Move the track's folder to `conductor/archive/` and remove it from the tracks file."
             - Label: "Delete", Description: "Permanently delete the track's folder and remove it from the tracks file."
             - Label: "Skip", Description: "Do nothing and leave it in the tracks file."
 
 3.  **Handle User Response:**
     *   **If "Archive":**
-        i.   **Setup:** Ensure `.cursor/archive/` exists.
-        ii.  **Move:** Move track folder to `.cursor/archive/<track_id>`.
+        i.   **Setup:** Ensure `conductor/archive/` exists.
+        ii.  **Move:** Move track folder to `conductor/archive/<track_id>`.
         iii. **Update Registry:** Remove track section from **Tracks Registry**.
         iv.  **Commit Conductor Files:** Follow the **Git Write Policy** in the Conductor rule before staging and committing. Suggested message: `chore(conductor): Archive track '<track_name>'`.
         v.   **Announce:** "Track '<track_name>' archived."

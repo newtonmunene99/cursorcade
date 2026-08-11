@@ -10,7 +10,7 @@ description: Display project and track progress
 - **AskQuestion** for structured user prompts (replaces Gemini `ask_user`)
 - **Write** / **StrReplace** for file operations (replaces `write_file` / `replace`)
 - **Shell** for shell commands (replaces `run_shell_command`)
-- Use relative paths under `.cursor/` for all Conductor artifacts
+- Use relative paths under `conductor/` for all Conductor artifacts
 
 ## Output Style
 
@@ -29,7 +29,7 @@ Locate installed plugin templates in this order:
 
 ## Parsing Cursor Plans
 
-Parse each track's plan file (`.cursor/plans/*.plan.md`):
+Parse each track's plan file (`conductor/plans/*.plan.md`):
 - Count todos by `status`: `pending`, `in_progress`, `completed`
 - Read markdown body for phase headings
 - Only support the standard tracks registry format: `- [ ] **Track:`

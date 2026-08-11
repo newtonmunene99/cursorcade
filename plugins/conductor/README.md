@@ -20,7 +20,7 @@ Context-driven development for Cursor: setup, spec, plan, implement, review, and
 
 ## Programme mode
 
-From `.cursor/reviews/*.md` → validate → split tracks → synthesis → implement in order (continue via explicit cleanup choices when unblocked).
+From `conductor/reviews/*.md` → validate → split tracks → synthesis → implement in order (continue via explicit cleanup choices when unblocked).
 
 Reference: `docs/examples/remediation-programme-example.md`
 
@@ -45,7 +45,7 @@ See [OKF v0.1](https://github.com/GoogleCloudPlatform/knowledge-catalog/blob/mai
 
 ## Artifacts
 
-- **Conductor:** `.cursor/context/`, `.cursor/specs/`, `.cursor/plans/`, `.cursor/reviews/`
+- **Conductor:** `conductor/context/`, `conductor/specs/`, `conductor/plans/`, `conductor/reviews/`
 - **OKF knowledge:** `knowledge/` or `<pkg>/knowledge/` in the repository
 
 ## Attribution

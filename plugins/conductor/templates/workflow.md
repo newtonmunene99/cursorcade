@@ -6,8 +6,8 @@ Follow **Agent Output Style** in the Conductor rule (**i-have-adhd** skill + `te
 
 ## Guiding Principles
 
-1. **The Plan is the Source of Truth:** All work must be tracked in the Cursor plan file (`.cursor/plans/*.plan.md` frontmatter `todos`)
-2. **The Tech Stack is Deliberate:** Changes to the tech stack must be documented in `.cursor/context/tech-stack.md` *before* implementation
+1. **The Plan is the Source of Truth:** All work must be tracked in the Cursor plan file (`conductor/plans/*.plan.md` frontmatter `todos`)
+2. **The Tech Stack is Deliberate:** Changes to the tech stack must be documented in `conductor/context/tech-stack.md` *before* implementation
 3. **Test-Driven Development:** Write unit tests before implementing functionality
 4. **High Code Coverage:** Aim for >80% code coverage for all modules
 5. **User Experience First:** Every decision should prioritize user experience
@@ -19,7 +19,7 @@ All tasks follow a strict lifecycle. **All Git write operations** (staging, comm
 
 ### Standard Task Workflow
 
-1. **Select Task:** Choose the next available todo from the Cursor plan file (`.cursor/plans/*.plan.md`) in sequential order
+1. **Select Task:** Choose the next available todo from the Cursor plan file (`conductor/plans/*.plan.md`) in sequential order
 
 2. **Mark In Progress:** Before beginning work, update the plan frontmatter: set the todo's `status` to `in_progress`
 
@@ -60,7 +60,7 @@ All tasks follow a strict lifecycle. **All Git write operations** (staging, comm
 
 7. **Document Deviations:** If implementation differs from tech stack:
    - **STOP** implementation
-   - Update `.cursor/context/tech-stack.md` with new design
+   - Update `conductor/context/tech-stack.md` with new design
    - Add dated note explaining the change
    - Resume implementation
 
@@ -120,7 +120,7 @@ Use this protocol when tests fail, behavior is unexpected, or a fix attempt did 
     -   If tests fail, follow the **Systematic Debugging Protocol** above. Use `AskQuestion` for final escalation if debugging stalls after 3 fix attempts.
 
 4.  **Propose a Detailed, Actionable Manual Verification Plan:**
-    -   **CRITICAL:** To generate the plan, first analyze `.cursor/context/product.md`, `.cursor/context/product-guidelines.md`, and the Cursor plan file to determine the user-facing goals of the completed phase.
+    -   **CRITICAL:** To generate the plan, first analyze `conductor/context/product.md`, `conductor/context/product-guidelines.md`, and the Cursor plan file to determine the user-facing goals of the completed phase.
     -   You **must** generate a step-by-step plan that walks the user through the verification process, including any necessary commands and specific, expected outcomes.
     -   The plan you present to the user **must** follow this format:
 
@@ -171,7 +171,7 @@ Before marking any task complete, verify:
 
 - [ ] All tests pass
 - [ ] Code coverage meets requirements (>80%)
-- [ ] Code follows project's code style guidelines (as defined in `.cursor/context/code_styleguides/`)
+- [ ] Code follows project's code style guidelines (as defined in `conductor/context/code_styleguides/`)
 - [ ] All public functions/methods are documented (e.g., docstrings, JSDoc, GoDoc)
 - [ ] Type safety is enforced (e.g., type hints, TypeScript types, Go types)
 - [ ] No linting or static analysis errors (using the project's configured tools)

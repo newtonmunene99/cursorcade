@@ -10,7 +10,7 @@ description: Validate a code review document against the repository before creat
 - **AskQuestion** for structured user prompts
 - **Write** / **StrReplace** for validation output
 - **Shell** for read-only verification (`test -f`, `rg`, `git grep`)
-- Use relative paths under `.cursor/` for Conductor artifacts
+- Use relative paths under `conductor/` for Conductor artifacts
 
 ## Output Style
 
@@ -35,8 +35,8 @@ Validate a review document in **Reviews Directory** against the codebase. Produc
 
 ### 2.1 Resolve review
 
-1. If `{{args}}` is non-empty, use as review path (relative to repo root or under `.cursor/reviews/`).
-2. Otherwise `AskQuestion` — header "Review path", type text, placeholder `.cursor/reviews/foo_YYYYMMDD-review.md`.
+1. If `{{args}}` is non-empty, use as review path (relative to repo root or under `conductor/reviews/`).
+2. Otherwise `AskQuestion` — header "Review path", type text, placeholder `conductor/reviews/foo_YYYYMMDD-review.md`.
 3. Verify file exists via Universal File Resolution.
 
 ### 2.2 Extract findings
@@ -76,7 +76,7 @@ Addendum structure:
 ```markdown
 # Validation — <review title>
 
-**Source:** `.cursor/reviews/<file>`
+**Source:** `conductor/reviews/<file>`
 **Validated:** YYYY-MM-DD
 
 ## Path verification

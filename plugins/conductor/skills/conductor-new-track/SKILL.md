@@ -10,7 +10,7 @@ description: Create a new track with brainstorm, spec, and Cursor plan
 - **AskQuestion** for structured user prompts (replaces Gemini `ask_user`)
 - **Write** / **StrReplace** for file operations (replaces `write_file` / `replace`)
 - **Shell** for shell commands (replaces `run_shell_command`)
-- Use relative paths under `.cursor/` for all Conductor artifacts
+- Use relative paths under `conductor/` for all Conductor artifacts
 
 ## Output Style
 
@@ -27,7 +27,7 @@ Locate installed plugin templates in this order:
 
 ## Cursor Plan Format
 
-When creating or updating implementation plans, write to `.cursor/plans/<slug>_<shortid>.plan.md` with this frontmatter:
+When creating or updating implementation plans, write to `conductor/plans/<slug>_<shortid>.plan.md` with this frontmatter:
 
 ```yaml
 ---
@@ -44,11 +44,11 @@ isProject: true
 - `status` values: `pending`, `in_progress`, `completed`
 - On task completion, set `status: completed` and append commit SHA to `content`
 - Markdown body below frontmatter carries phases, goals, architecture
-- Register plan path in `.cursor/context/tracks.md`
+- Register plan path in `conductor/context/tracks.md`
 
 ## Tracks Registry Format
 
-Use this format in `.cursor/context/tracks.md`:
+Use this format in `conductor/context/tracks.md`:
 
 ```markdown
 - [ ] **Track: Description**
@@ -107,7 +107,7 @@ After loading the track description, check for **programme mode**:
 
 | Signal | Action |
 | ------ | ------ |
-| User references `.cursor/reviews/*.md` | Enter programme mode |
+| User references `conductor/reviews/*.md` | Enter programme mode |
 | Paste includes numbered findings (§3.x, ARCH-N, Addendum) | Enter programme mode |
 | Description mentions "remediation", "review findings", or lists ≥6 distinct items | Enter programme mode |
 | Otherwise | Continue single-track flow (§2.2) |
@@ -219,7 +219,7 @@ Skip multi-approach design. Use **one question per `AskQuestion` call** to cover
 3.  **Generate Plan:**
     *   Read the confirmed `spec.md` content for this track.
     *   Resolve and read the **Workflow** file (via the **Universal File Resolution Protocol** using the project's index file).
-    *   Generate a Cursor plan file at `.cursor/plans/<slug>_<shortid>.plan.md` with frontmatter `todos` (see Cursor Plan Format above and **Plan Authoring Guide**).
+    *   Generate a Cursor plan file at `conductor/plans/<slug>_<shortid>.plan.md` with frontmatter `todos` (see Cursor Plan Format above and **Plan Authoring Guide**).
     *   **CRITICAL:** Each todo must have `id`, `content`, and `status: pending`.
     *   **CRITICAL:** The plan structure MUST adhere to the **Workflow** file (e.g., TDD: separate todos for "Write Tests" and "Implement").
     *   **CRITICAL: Mandatory sync bookends.** First todo MUST be `conductor-sync-in-progress`; last todo MUST be `conductor-sync-complete`. Do NOT inject git-isolation todos unless the user explicitly requested one during planning.
@@ -285,7 +285,7 @@ When programme includes a decision track, at artifact write time:
 
 1. **Resolve bundle root** per **Knowledge Bundle Resolution** in the Conductor rule (load `templates/knowledge/bundle-placement-guide.md`). Prefer `<pkg>/knowledge/` from review/track scope; else repo-root `knowledge/`.
 2. If no bundle exists, scaffold from `templates/knowledge/` at the resolved root (`index.md`, `log.md`, `decisions/index.md`).
-3. Link discovered bundle(s) from `.cursor/context/index.md` (e.g. `[<pkg> knowledge](../../<pkg>/knowledge/)` — adjust relative path).
+3. Link discovered bundle(s) from `conductor/context/index.md` (e.g. `[<pkg> knowledge](../../<pkg>/knowledge/)` — adjust relative path).
 4. Set `metadata.json`: `"track_role": "decision"`, `"deliverable": "<bundle-root>/decisions/<slug>.md"`.
 5. Add proposed entry to `<bundle-root>/decisions/index.md` and `<bundle-root>/log.md`.
 6. Append backlog gating from `templates/backlog-gating-snippet.md`.
@@ -296,8 +296,8 @@ Use `templates/knowledge/decision-concept.md` for the OKF deliverable shape (`ty
 
 1.  **Check for existing track name:** Before generating a new Track ID, resolve the **Specs Directory** using the **Universal File Resolution Protocol**. List all existing track directories in that resolved path. Extract the short names from these track IDs (e.g., ``shortname_YYYYMMDD`` -> `shortname`). If the proposed short name for the new track (derived from the initial description) matches an existing short name, halt the `newTrack` creation. Explain that a track with that name already exists and suggest choosing a different name or resuming the existing track.
 2.  **Generate Track ID:** Create a unique Track ID (e.g., ``shortname_YYYYMMDD``).
-3.  **Create Directory:** Create a new directory for the tracks: `.cursor/specs/<track_id>/`.
-4.  **Create `metadata.json`:** Create a metadata file at `.cursor/specs/<track_id>/metadata.json` with content like:
+3.  **Create Directory:** Create a new directory for the tracks: `conductor/specs/<track_id>/`.
+4.  **Create `metadata.json`:** Create a metadata file at `conductor/specs/<track_id>/metadata.json` with content like:
     ```json
     {
       "track_id": "<track_id>",
@@ -316,9 +316,9 @@ Use `templates/knowledge/decision-concept.md` for the OKF deliverable shape (`ty
     ```
     *   Populate fields with actual values. Use the current timestamp. Omit programme fields for single tracks.
 5.  **Write Files:**
-    *   Write the confirmed specification content to `.cursor/specs/<track_id>/spec.md`.
-    *   Write the confirmed plan content to `.cursor/plans/<slug>_<shortid>.plan.md`.
-    *   Write the index file to `.cursor/specs/<track_id>/index.md` with content:
+    *   Write the confirmed specification content to `conductor/specs/<track_id>/spec.md`.
+    *   Write the confirmed plan content to `conductor/plans/<slug>_<shortid>.plan.md`.
+    *   Write the index file to `conductor/specs/<track_id>/index.md` with content:
         ```markdown
         # Track <track_id> Context
 

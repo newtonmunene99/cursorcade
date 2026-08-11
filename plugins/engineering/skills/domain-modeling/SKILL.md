@@ -5,7 +5,7 @@ description: Build and sharpen a project's domain model. Use when the user wants
 
 # Domain Modeling
 
-Actively build and sharpen the project's domain model as you design. This is the *active* discipline — challenging terms, inventing edge-case scenarios, and writing the glossary and decisions down the moment they crystallise. (Merely *reading* `.cursor/context/product.md` (or repo-root `CONTEXT.md` if present) for vocabulary is not this skill — that's a one-line habit any skill can do. This skill is for when you're changing the model, not just consuming it.)
+Actively build and sharpen the project's domain model as you design. This is the *active* discipline — challenging terms, inventing edge-case scenarios, and writing the glossary and decisions down the moment they crystallise. (Merely *reading* `conductor/context/product.md` (or repo-root `CONTEXT.md` if present) for vocabulary is not this skill — that's a one-line habit any skill can do. This skill is for when you're changing the model, not just consuming it.)
 
 ## File structure
 
@@ -26,8 +26,8 @@ knowledge/                    ← repo-wide (default for "project docs")
     └── <slug>.md
 ```
 
-`.cursor/context/product.md` — Conductor glossary (not OKF).  
-`.cursor/knowledge/` — fallback only when no domain/repo bundle applies.
+`conductor/context/product.md` — Conductor glossary (not OKF).  
+`conductor/knowledge/` — fallback only when no domain/repo bundle applies.
 
 Legacy `docs/adr/` — migrate to OKF concepts in the appropriate bundle.
 
@@ -37,7 +37,7 @@ Create bundles lazily when the user asks for knowledge/project docs or when a de
 
 ### Challenge against the glossary
 
-When the user uses a term that conflicts with the existing language in `.cursor/context/product.md` (or repo-root `CONTEXT.md` if present), call it out immediately. "Your glossary defines 'cancellation' as X, but you seem to mean Y — which is it?"
+When the user uses a term that conflicts with the existing language in `conductor/context/product.md` (or repo-root `CONTEXT.md` if present), call it out immediately. "Your glossary defines 'cancellation' as X, but you seem to mean Y — which is it?"
 
 ### Sharpen fuzzy language
 
@@ -53,9 +53,9 @@ When the user states how something works, check whether the code agrees. If you 
 
 ### Update CONTEXT.md inline
 
-When a term is resolved, update `.cursor/context/product.md` (or repo-root `CONTEXT.md` if present) right there. Don't batch these up — capture them as they happen. Use the format in [CONTEXT-FORMAT.md](./CONTEXT-FORMAT.md).
+When a term is resolved, update `conductor/context/product.md` (or repo-root `CONTEXT.md` if present) right there. Don't batch these up — capture them as they happen. Use the format in [CONTEXT-FORMAT.md](./CONTEXT-FORMAT.md).
 
-`.cursor/context/product.md` (or repo-root `CONTEXT.md` if present) should be totally devoid of implementation details. Do not treat `.cursor/context/product.md` (or repo-root `CONTEXT.md` if present) as a spec, a scratch pad, or a repository for implementation decisions. It is a glossary and nothing else.
+`conductor/context/product.md` (or repo-root `CONTEXT.md` if present) should be totally devoid of implementation details. Do not treat `conductor/context/product.md` (or repo-root `CONTEXT.md` if present) as a spec, a scratch pad, or a repository for implementation decisions. It is a glossary and nothing else.
 
 ### Offer OKF decision concepts sparingly
 

@@ -5,7 +5,7 @@ alwaysApply: true
 
 # Conductor Context
 
-If a user mentions a "plan" or asks about the plan, and they have used Conductor in the current session, they are likely referring to `.cursor/context/tracks.md` or a track plan in `.cursor/plans/*.plan.md`.
+If a user mentions a "plan" or asks about the plan, and they have used Conductor in the current session, they are likely referring to `conductor/context/tracks.md` or a track plan in `conductor/plans/*.plan.md`.
 
 ## Universal File Resolution Protocol
 
@@ -13,44 +13,44 @@ If a user mentions a "plan" or asks about the plan, and they have used Conductor
 To find a file (e.g., "**Product Definition**") within a specific context (Project Root or a specific Track):
 
 1.  **Identify Index:** Determine the relevant index file:
-    -   **Project Context:** `.cursor/context/index.md`
+    -   **Project Context:** `conductor/context/index.md`
     -   **Track Context:**
         a. Resolve and read the **Tracks Registry** (via Project Context).
         b. Find the entry for the specific `<track_id>`.
-        c. Follow the link provided in the registry to locate the track's spec folder. The index file is `.cursor/specs/<track_id>/index.md`.
+        c. Follow the link provided in the registry to locate the track's spec folder. The index file is `conductor/specs/<track_id>/index.md`.
         d. **Fallback:** If the track is not yet registered (e.g., during creation) or the link is broken:
-            1. Resolve the **Specs Directory** (`.cursor/specs/`).
-            2. The index file is `.cursor/specs/<track_id>/index.md`.
+            1. Resolve the **Specs Directory** (`conductor/specs/`).
+            2. The index file is `conductor/specs/<track_id>/index.md`.
 
 2.  **Check Index:** Read the index file and look for a link with a matching or semantically similar label.
 
 3.  **Resolve Path:** If a link is found, resolve its path **relative to the directory containing the `index.md` file**.
-    -   *Example:* If `.cursor/context/index.md` links to `./workflow.md`, the full path is `.cursor/context/workflow.md`.
+    -   *Example:* If `conductor/context/index.md` links to `./workflow.md`, the full path is `conductor/context/workflow.md`.
 
 4.  **Fallback:** If the index file is missing or the link is absent, use the **Default Path** keys below.
 
 5.  **Verify:** You MUST verify the resolved file actually exists on the disk.
 
 **Standard Default Paths (Project):**
-- **Product Definition**: `.cursor/context/product.md`
-- **Tech Stack**: `.cursor/context/tech-stack.md`
-- **Workflow**: `.cursor/context/workflow.md`
-- **Product Guidelines**: `.cursor/context/product-guidelines.md`
-- **Tracks Registry**: `.cursor/context/tracks.md`
-- **Backlog**: `.cursor/context/backlog.md`
-- **Reviews Directory**: `.cursor/reviews/`
-- **Review document**: `.cursor/reviews/<slug>_YYYYMMDD-review.md`
-- **Knowledge Bundle (OKF)**: resolve per **Knowledge Bundle Resolution** below — typically `knowledge/` at repo root or `<pkg>/knowledge/`. Not `.cursor/knowledge/` by default.
+- **Product Definition**: `conductor/context/product.md`
+- **Tech Stack**: `conductor/context/tech-stack.md`
+- **Workflow**: `conductor/context/workflow.md`
+- **Product Guidelines**: `conductor/context/product-guidelines.md`
+- **Tracks Registry**: `conductor/context/tracks.md`
+- **Backlog**: `conductor/context/backlog.md`
+- **Reviews Directory**: `conductor/reviews/`
+- **Review document**: `conductor/reviews/<slug>_YYYYMMDD-review.md`
+- **Knowledge Bundle (OKF)**: resolve per **Knowledge Bundle Resolution** below — typically `knowledge/` at repo root or `<pkg>/knowledge/`. Not `conductor/knowledge/` by default.
 - **Decision concept**: `<bundle-root>/decisions/<slug>.md` (OKF concept ID: `decisions/<slug>`)
 - **Decision evidence**: `<bundle-root>/decisions/evidence/<slug>.md`
-- **Specs Directory**: `.cursor/specs/`
-- **Plans Directory**: `.cursor/plans/`
-- **Archive Directory**: `.cursor/archive/`
+- **Specs Directory**: `conductor/specs/`
+- **Plans Directory**: `conductor/plans/`
+- **Archive Directory**: `conductor/archive/`
 
 **Standard Default Paths (Track):**
-- **Specification**: `.cursor/specs/<track_id>/spec.md`
-- **Implementation Plan**: `.cursor/plans/<plan_filename>.plan.md` (linked from Tracks Registry)
-- **Metadata**: `.cursor/specs/<track_id>/metadata.json`
+- **Specification**: `conductor/specs/<track_id>/spec.md`
+- **Implementation Plan**: `conductor/plans/<plan_filename>.plan.md` (linked from Tracks Registry)
+- **Metadata**: `conductor/specs/<track_id>/metadata.json`
 
 **Track `metadata.json` optional fields** (programme tracks):
 
@@ -66,7 +66,7 @@ To find a file (e.g., "**Product Definition**") within a specific context (Proje
 **PROTOCOL:** Used by `/conductor-implement` and `/conductor-status`.
 
 1. Parse **Tracks Registry** — for each track entry extract status (`[ ]`, `[~]`, `[x]`), description, and `<track_id>` from the spec link (`../specs/<track_id>/spec.md`).
-2. Read `.cursor/specs/<track_id>/metadata.json` for each incomplete track (`[ ]` or `[~]`). Default `depends_on: []`, `order: null`.
+2. Read `conductor/specs/<track_id>/metadata.json` for each incomplete track (`[ ]` or `[~]`). Default `depends_on: []`, `order: null`.
 3. **Eligible:** incomplete track where every id in `depends_on` is `[x]` in the registry.
 4. **Blocked:** incomplete track where any `depends_on` id is not `[x]`. Record first missing dependency for messaging.
 5. **Sort eligible** by `order` ascending (null/`order` missing → treat as `999`), then registry order.
@@ -85,13 +85,13 @@ To find a file (e.g., "**Product Definition**") within a specific context (Proje
 1. **Discover** existing bundles: `**/knowledge/index.md` in the repo (exclude `.git`).
 2. **Match scope** to track spec, review **Scope**, or user-stated module → use `<module>/knowledge/`.
 3. **Repo-wide** knowledge → use `knowledge/` at repository root.
-4. **Fallback** `.cursor/knowledge/` only when no domain applies and user confirms.
+4. **Fallback** `conductor/knowledge/` only when no domain applies and user confirms.
 
-Load `templates/knowledge/bundle-placement-guide.md` from the Conductor plugin for scaffold and concept types. Link discovered bundles from `.cursor/context/index.md` — knowledge lives **in the repo beside code**, not only under `.cursor/`.
+Load `templates/knowledge/bundle-placement-guide.md` from the Conductor plugin for scaffold and concept types. Link discovered bundles from `conductor/context/index.md` — knowledge lives **in the repo beside code**, not only under `conductor/`.
 
 ## Cursor Plan Format
 
-Implementation plans use Cursor-native frontmatter in `.cursor/plans/*.plan.md`:
+Implementation plans use Cursor-native frontmatter in `conductor/plans/*.plan.md`:
 
 ```yaml
 ---

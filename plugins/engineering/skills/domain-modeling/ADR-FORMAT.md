@@ -8,6 +8,6 @@ Replaces numbered ADRs in `docs/adr/`. See [OKF v0.1](https://github.com/GoogleC
 | ----- | ----------- | ---------------- | ---------- |
 | Domain package | `<pkg>/knowledge/` | `<pkg>/knowledge/decisions/<slug>.md` | `decisions/<slug>` |
 | Repository | `knowledge/` | `knowledge/decisions/<slug>.md` | `decisions/<slug>` |
-| Fallback | `.cursor/knowledge/` | only when no code domain applies |
+| Fallback | `conductor/knowledge/` | only when no code domain applies |
 
-Discover existing bundles: `**/knowledge/index.md`. Prefer extending an existing domain bundle over creating `.cursor/knowledge/`.
+Discover existing bundles: `**/knowledge/index.md`. Prefer extending an existing domain bundle over creating `conductor/knowledge/`.

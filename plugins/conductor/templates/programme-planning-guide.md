@@ -8,7 +8,7 @@ Reference example: `docs/examples/remediation-programme-example.md`.
 
 | Signal | Action |
 | ------ | ------ |
-| User references `.cursor/reviews/*.md` | Programme mode |
+| User references `conductor/reviews/*.md` | Programme mode |
 | Paste includes numbered findings (§3.x, ARCH-N, Addendum) | Programme mode |
 | Description mentions "remediation", "review findings", or ≥6 distinct items | Programme mode |
 | Otherwise | Single-track flow |
