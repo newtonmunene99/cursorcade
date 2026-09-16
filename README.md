@@ -70,6 +70,7 @@ cursorcade/
 │       ├── .cursor-plugin/
 │       │   └── plugin.json
 │       ├── rules/
+│       ├── scripts/               # conductor_state.py — deterministic registry / plan / path checks
 │       ├── skills/
 │       ├── commands/
 │       └── templates/

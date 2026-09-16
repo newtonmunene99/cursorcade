@@ -18,6 +18,28 @@ Context-driven development for Cursor: setup, spec, plan, implement, review, and
 | `/conductor-validate-review` | Validate review findings against repo |
 | `/conductor-prototype` | Decision-track spike on `spike/<slug>` branch |
 
+## Execution model
+
+Conductor runs a track as a small execution graph, not a linear chain:
+
+| Concern | Mechanism | Where |
+| ------- | --------- | ----- |
+| Plumbing without the model | `scripts/conductor_state.py` (`tracks`, `plan`, `verify-paths`) | Deterministic Plumbing Protocol |
+| Real dependencies only | todo `blocked_by` + `files`; implement runs any ready todo | Plan Authoring Guide |
+| Parallel work | disjoint-file todos and parallel-ready tracks fan out to subagents, user-confirmed | Parallel Dispatch Protocol |
+| Verification on the edge | fresh read-only verifier before each commit and on every plan draft | Independent Verification Protocol |
+| Local failures | retry / skip / repair / isolate / escalate / stop table | Failure Policy |
+| Bounded loops | `attempts` per todo, `review_rounds` per plan, hard caps | Convergence Budgets |
+| Cost | scripts → cheap model → strong model by task | Model Routing |
+
+All protocols live in `rules/conductor.mdc`. The script resolves like templates: `~/.cursor/plugins/local/conductor/scripts/` → `~/.cursor/plugins/cache/` → `./plugins/conductor/scripts/`.
+
+```sh
+python3 <conductor_state.py> tracks
+python3 <conductor_state.py> plan conductor/plans/<file>.plan.md
+python3 <conductor_state.py> verify-paths <plan-or-review.md> --create-ok
+```
+
 ## Programme mode
 
 From `conductor/reviews/*.md` → validate → split tracks → synthesis → implement in order (continue via explicit cleanup choices when unblocked).

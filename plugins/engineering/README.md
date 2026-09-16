@@ -10,7 +10,7 @@ Works with **Conductor** for remediation programmes; OKF knowledge lives **in th
 | :------ | :---------- |
 | `/grilling` | Stress-test a plan or decision |
 | `/grill-with-docs` | Grilling + OKF knowledge / decision concepts |
-| `/research` | Primary-source research → markdown |
+| `/research` | Scoped, parallel-lane primary-source research → deduped, checked markdown |
 | `/prototype` | Throwaway spike (use `/conductor-prototype` for decision tracks) |
 | `/improve-codebase-architecture` | Deepening opportunities → HTML report |
 
